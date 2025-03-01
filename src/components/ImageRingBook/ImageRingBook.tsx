@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { getImages } from '../../utils/api';
 
+interface ImageResponse {
+    src: string;
+    alt: string;
+  }
 interface ImageRingBookProps {
-    images: string[];
+    images: ImageResponse[];
 }
 
 const ImageRingBook: React.FC<ImageRingBookProps> = ({ images }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-    const [imageUrls, setImageUrls] = useState<string[]>(images);
+    const [imageUrls, setImageUrls] = useState<ImageResponse[]>(images);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -44,7 +48,7 @@ const ImageRingBook: React.FC<ImageRingBookProps> = ({ images }) => {
     return (
         <div data-testid="image-ring-book">
             <img
-                src={imageUrls[currentImageIndex]}
+                src={imageUrls[currentImageIndex].src}
                 alt={`image ${currentImageIndex + 1}`}
             />
             <div>
