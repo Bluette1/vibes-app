@@ -1,6 +1,12 @@
 import React from 'react';
 import { useAudioPlayer } from '../../hooks/useAudioPlayer/useAudioPlayer';
 import './AudioPlayer.css';
+import PauseIcon from '../Icons/PauseIcon';
+import PlayIcon from '../Icons/PlayIcon';
+import UnloopIcon from '../Icons/UnLoopIcon';
+import LoopIcon from '../Icons/LoopIcon';
+import VolumeOnIcon from '../Icons/VolumeOnIcon';
+import MutedIcon from '../Icons/MutedIcon';
 
 interface AudioPlayerProps {
   src: string;
@@ -23,39 +29,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src }) => {
           onClick={isPlaying ? pause : play}
           className="bg-gray-200 hover:bg-gray-300 p-2 rounded-md"
         >
-          {isPlaying ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-pause"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M10 4v16M14 4v16" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-play"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M5 4v16l15 -8z" />
-            </svg>
-          )}
+          {isPlaying ? <PauseIcon /> : <PlayIcon />}
         </button>
         <span className="tooltip">{isPlaying ? 'Pause' : 'Play'}</span>
       </div>
@@ -67,42 +41,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src }) => {
           onClick={toggleLoop}
           className="bg-gray-200 hover:bg-gray-300 p-2 rounded-md"
         >
-          {isLoop ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-loop"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M12 3v3m0 -3a9 9 0 0 0 -9 9h3m-3 0a9 9 0 0 0 9 9v-3" />
-              <path d="M21 12h-3m3 0a9 9 0 0 0 -9 -9v3" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-loop-off"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M3 3l18 18" />
-              <path d="M12 3v3m0 -3a9 9 0 0 0 -9 9h3" />
-              <path d="M21 12h-3m3 0a9 9 0 0 0 -9 -9v3" />
-            </svg>
-          )}
+          {isLoop ? <UnloopIcon /> : <LoopIcon />}
         </button>
         <span className="tooltip">{isLoop ? 'Unloop' : 'Loop'}</span>
       </div>
@@ -115,43 +54,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src }) => {
             onClick={toggleMute}
             className="bg-gray-200 hover:bg-gray-300 p-2 rounded-md"
           >
-            {isMuted ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-volume-off"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M9 12h-4l-3 3v-12l3 3h4z" />
-                <path d="M16 16l4 4m0 -4l-4 4" />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-volume"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M9 12h-4l-3 3v-12l3 3h4z" />
-                <path d="M16 16a4 4 0 0 0 0 -8" />
-                <path d="M18 12a6 6 0 0 0 -2 -4.472" />
-                <path d="M20 12a8 8 0 0 0 -4 -7.464" />
-              </svg>
-            )}
+            {isMuted ? <MutedIcon /> : <VolumeOnIcon />}
           </button>
           <span className="tooltip">{isMuted ? 'Unmute' : 'Mute'}</span>
         </div>
