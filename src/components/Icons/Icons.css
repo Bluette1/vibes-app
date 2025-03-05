@@ -1,0 +1,23 @@
+.icon {
+    display: inline-block; /* Ensures the icon behaves like a block-level element */
+    vertical-align: middle; /* Aligns the icon vertically in line with text */
+  }
+  
+  .icon-tabler {
+    stroke-width: 2; /* Default stroke width for Tabler icons */
+    stroke: currentColor; /* Uses the current text color for the stroke */
+    fill: none; /* No fill by default */
+  }
+  
+  .icon-tabler-play {
+    /* Specific styles for the play icon can go here */
+  }
+  
+  .icon-tabler-pause {
+    /* Specific styles for the pause icon can go here */
+  }
+  
+  /* Additional styles for hover effects or active states can be added */
+  .icon:hover {
+    opacity: 0.7; /* Example hover effect */
+  }

@@ -1,14 +1,19 @@
+// components/OpenButton/OpenButton.tsx
 import React from 'react';
+import './OpenButton.css';
+import OpenIcon from '../Icons/OpenIcon';
 
-interface OpenButtonProps{
-    onOpen: () => void;
+
+interface OpenButtonProps {
+  onOpen: () => void;
 }
-const OpenButton: React.FC<OpenButtonProps> = ({onOpen}) => {
-    return (
-        <button onClick={onOpen} className='bg-gray-600 text-white px-4 py-2 rounded-md'>
-            Open
-        </button>
-    );
+
+const OpenButton: React.FC<OpenButtonProps> = ({ onOpen }) => {
+  return (
+    <button className="open-button" onClick={onOpen}>
+      <OpenIcon/>
+    </button>
+  );
 };
 
 export default OpenButton;
