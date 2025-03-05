@@ -1,54 +1,76 @@
-# React + TypeScript + Vite
+# Vibes App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vibes is a meditation web application designed to enhance your mindfulness experience through beautiful nature visuals and calming background music. The app aims to create a serene environment for meditation, allowing users to customize their sessions to suit their preferences.
 
-Currently, two official plugins are available:
+![Screenshot Vibes App](./src/assets/images/vibes-app-screenshot.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **Nature Images**: Display a series of calming nature images to enhance the meditation experience.
+- **Background Music**: Play soothing background music during meditation sessions.
+- **Image Transition Timing**: Adjust the interval at which nature images change.
+- **Music Track Selection**: Choose from different background music tracks.
+- **Offline Mode**: Access cached content and use the app without an internet connection.
+- **Session Preferences**: Save user preferences for music and image transitions.
+- **Meditation History**: Track and view meditation session history.
+- **Meditation Reminders**: Set daily or weekly reminders for meditation.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Technologies Used
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Frontend**: React, Vite, Tailwind CSS
+- **Backend**: Ruby on Rails (existing backend)
+- **Database**: PostgreSQL (for user preferences and history)
+- **Caching**: Redis (for API response caching)
+- **APIs**: Getty Images API for high-quality nature images
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- Node.js
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/vibes-app.git
+   cd vibes-app
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:3000`.
+
+## Usage
+
+- Navigate through the app to discover and customize your meditation experience.
+- Use the settings to adjust image transition intervals and select your preferred music tracks.
+
+## Contributing
+
+Contributions are welcome! Please open an issue to discuss any improvements or features you'd like to propose.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Acknowledgments
+
+- Inspiration for the Vibes app comes from the need for accessible meditation tools.
+- Thanks to the contributors and the community for their support!
