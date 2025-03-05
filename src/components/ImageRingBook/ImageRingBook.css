@@ -140,3 +140,34 @@
     height: 1.5em; /* Adjust size as needed */
     color: #4a5568; /* Adjust color as needed */
   }
+
+  .interval-settings {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .interval-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  
+  .interval-buttons button {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .interval-buttons button:hover {
+    background-color: #e6e6e6;
+  }
+  
+  .interval-buttons button.active {
+    background-color: #4a90e2;
+    color: white;
+    border-color: #3a80d2;
+  }
