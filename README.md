@@ -21,7 +21,7 @@ Vibes is a meditation web application designed to enhance your mindfulness exper
 - **Backend**: Ruby on Rails (existing backend)
 - **Database**: PostgreSQL (for user preferences and history)
 - **Caching**: Redis (for API response caching)
-- **APIs**: Getty Images API for high-quality nature images
+- **APIs**: UnSplash Images API for high-quality nature images
 
 ## Getting Started
 
@@ -64,7 +64,11 @@ Vibes is a meditation web application designed to enhance your mindfulness exper
 
 ## Contributing
 
-Contributions are welcome! Please open an issue to discuss any improvements or features you'd like to propose.
+We welcome contributions! Please fork the repository and create a pull request with your changes.
+
+[User Stories](https://www.notion.so/User-Stories-Vibes-React-App-1abe6a4d98f280e3ac7cdf0bc4aafd65?pvs=4)
+[MVP User Stories](https://www.notion.so/MVP-User-Stories-Vibes-React-App-1abe6a4d98f2809ea876d98865c9c95f)
+
 
 ## License
 
@@ -72,5 +76,14 @@ This project is licensed under the MIT License.
 
 ## Acknowledgments
 
-- Inspiration for the Vibes app comes from the need for accessible meditation tools.
-- Thanks to the contributors and the community for their support!
+The meditation tracks in this application are sourced from:
+
+- [The Cyber Hymnal](https://hymnary.org/hymnal/CYBER)
+  - Christian hymns from many denominations and languages.
+- [Free Music Archive](https://freemusicarchive.org/)
+  - Collection of ambient and meditation music
+  - License: Various Creative Commons licenses (CC BY, CC BY-SA)
+- [UnSplash](https://unsplash.com/)
+  - Free nature images and visuals
+- [PicJumbo](https://picjumbo.com/)
+  - Free nature images, backgrounds and photos
