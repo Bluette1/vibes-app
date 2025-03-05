@@ -19,7 +19,8 @@ const ImageRingBook: React.FC<ImageRingBookProps> = ({ images, autoChangeInterva
   const [isFlipping, setIsFlipping] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadedImages, setLoadedImages] = useState<ImageResponse[]>([]);
-
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  
   // Get saved interval from localStorage or use prop value as default
   const [transitionInterval, setTransitionInterval] = useState(() => {
     const savedInterval = localStorage.getItem('transitionInterval');
@@ -61,6 +62,28 @@ const ImageRingBook: React.FC<ImageRingBookProps> = ({ images, autoChangeInterva
     localStorage.setItem('transitionInterval', transitionInterval.toString());
   }, [transitionInterval]);
 
+  // Close modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const modal = document.querySelector('.settings-modal');
+      const settingsIcon = document.querySelector('.settings-icon');
+      
+      if (modal && settingsIcon && 
+          !modal.contains(event.target as Node) && 
+          !settingsIcon.contains(event.target as Node)) {
+        setShowSettingsModal(false);
+      }
+    };
+
+    if (showSettingsModal) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSettingsModal]);
+
   const nextImage = () => {
     if (loadedImages.length <= 1) return;
 
@@ -87,6 +110,10 @@ const ImageRingBook: React.FC<ImageRingBookProps> = ({ images, autoChangeInterva
 
   const handleIntervalChange = (milliseconds: number) => {
     setTransitionInterval(milliseconds);
+  };
+
+  const toggleSettingsModal = () => {
+    setShowSettingsModal(!showSettingsModal);
   };
 
   if (isLoading || loadedImages.length === 0) {
@@ -121,29 +148,44 @@ const ImageRingBook: React.FC<ImageRingBookProps> = ({ images, autoChangeInterva
             <RightChevron />
           </button>
         </div>
-
-        <div className="interval-settings">
-          <p>Transition interval:</p>
-          <div className="interval-buttons">
-            <button
-              onClick={() => handleIntervalChange(5000)}
-              className={transitionInterval === 5000 ? 'active' : ''}
-            >
-              5s
-            </button>
-            <button
-              onClick={() => handleIntervalChange(10000)}
-              className={transitionInterval === 10000 ? 'active' : ''}
-            >
-              10s
-            </button>
-            <button
-              onClick={() => handleIntervalChange(20000)}
-              className={transitionInterval === 20000 ? 'active' : ''}
-            >
-              20s
-            </button>
-          </div>
+        
+        <div className="settings-control">
+          <button 
+            onClick={toggleSettingsModal} 
+            className="settings-icon" 
+            aria-label="Adjust transition timing"
+          >
+            ⚙️
+          </button>
+          
+          {showSettingsModal && (
+            <div className="settings-modal">
+              <h3>Transition Interval</h3>
+              <div className="interval-buttons">
+                <button 
+                  onClick={() => handleIntervalChange(5000)} 
+                  className={transitionInterval === 5000 ? 'active' : ''}
+                >
+                  5s
+                </button>
+                <button 
+                  onClick={() => handleIntervalChange(10000)} 
+                  className={transitionInterval === 10000 ? 'active' : ''}
+                >
+                  10s
+                </button>
+                <button 
+                  onClick={() => handleIntervalChange(20000)} 
+                  className={transitionInterval === 20000 ? 'active' : ''}
+                >
+                  20s
+                </button>
+              </div>
+              <div className="current-interval">
+                Current: {transitionInterval / 1000}s
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
