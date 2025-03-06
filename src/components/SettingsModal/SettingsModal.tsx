@@ -1,15 +1,24 @@
+
 import React from 'react';
+import './SettingsModal.css'
+import CloseIcon from '../Icons/CloseIcon';
 
 interface SettingsModalProps {
   transitionInterval: number;
   handleIntervalChange: (milliseconds: number) => void;
   onClose: () => void;
+  tracks: { id: string; name: string; src: string }[]; // Add tracks prop
+  selectedTrackId: string; // Add selectedTrackId prop
+  handleTrackChange: (trackId: string) => void; // Handler for track change
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
   transitionInterval,
   handleIntervalChange,
   onClose,
+  tracks,
+  selectedTrackId,
+  handleTrackChange,
 }) => {
   return (
     <div className="settings-modal">
@@ -35,7 +44,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </button>
       </div>
       <div className="current-interval">Current: {transitionInterval / 1000}s</div>
-      <span onClick={onClose} className="close-icon" role="button" aria-label="Close settings modal">❎</span> {/* Close icon */}
+
+      <h3>Select Music Track</h3>
+      <select
+        value={selectedTrackId}
+        onChange={(e) => handleTrackChange(e.target.value)}
+        className="track-select"
+      >
+        {tracks.map((track) => (
+          <option key={track.id} value={track.id}>
+            {track.name}
+          </option>
+        ))}
+      </select>
+
+      <span onClick={onClose} role="button" aria-label="Close settings modal">
+        <CloseIcon />
+      </span>
     </div>
   );
 };

@@ -19,8 +19,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ tracks, defaultTrackId }) => 
     defaultTrackId || (tracks.length > 0 ? tracks[0].id : '')
   );
 
-  const selectedTrack = tracks.find(track => track.id === selectedTrackId) || tracks[0];
-  
+  const selectedTrack = tracks.find((track) => track.id === selectedTrackId) || tracks[0];
+
   const { isPlaying, isMuted, isLoop, volume, play, pause, toggleMute, toggleLoop, setVolume } =
     useAudioPlayer(selectedTrack.src);
 
@@ -28,49 +28,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ tracks, defaultTrackId }) => 
     setVolume(parseFloat(event.target.value));
   };
 
-  const handleTrackChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTrackId = event.target.value;
-    setSelectedTrackId(newTrackId);
-    
-    // Save to localStorage for future sessions
-    localStorage.setItem('selectedMusicTrackId', newTrackId);
-    
-    // If it was playing, continue playing the new track
-    if (isPlaying) {
-      setTimeout(() => play(), 0);
-    }
-  };
-
   // Load user's last selected track from localStorage
   useEffect(() => {
     const savedTrackId = localStorage.getItem('selectedMusicTrackId');
-    if (savedTrackId && tracks.some(track => track.id === savedTrackId)) {
+    if (savedTrackId && tracks.some((track) => track.id === savedTrackId)) {
       setSelectedTrackId(savedTrackId);
     }
   }, [tracks]);
 
   return (
     <div data-testid="audio-player" className="flex flex-wrap items-center space-x-2 gap-y-2">
-      {/* Track Selection */}
-      <div className="w-full mb-2">
-        <label htmlFor="track-select" className="mr-2 text-sm font-medium">
-          Music Track:
-        </label>
-        <select
-          id="track-select"
-          value={selectedTrackId}
-          onChange={handleTrackChange}
-          className="bg-white border border-gray-300 rounded px-3 py-1 text-sm"
-          aria-label="Select music track"
-        >
-          {tracks.map(track => (
-            <option key={track.id} value={track.id}>
-              {track.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* Play/Pause Button */}
       <div className="relative">
         <button

@@ -17,9 +17,10 @@ const Home: React.FC = () => {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   const [transitionInterval, setTransitionInterval] = useState<number>(10000); // Default interval
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false); // State for settings modal
+  const [selectedTrackId, setSelectedTrackId] = useState<string>('focused'); // State for selected track
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -53,6 +54,11 @@ const Home: React.FC = () => {
     setIsSettingsModalOpen(!isSettingsModalOpen);
   };
 
+  const handleTrackChange = (trackId: string) => {
+    setSelectedTrackId(trackId);
+    // You might also want to play the selected track here
+  };
+
   return (
     <div className="flex flex-col items-center justify-center">
       {isOpen ? (
@@ -74,11 +80,10 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <>
-              <AudioPlayer tracks={tracks} />
+              <AudioPlayer tracks={tracks} defaultTrackId={selectedTrackId} />
 
               <section className="flex">
                 <>
-                  {' '}
                   <button onClick={toggleSettingsModal} className="settings-button">
                     ⚙️
                   </button>
@@ -87,6 +92,9 @@ const Home: React.FC = () => {
                       transitionInterval={transitionInterval}
                       handleIntervalChange={setTransitionInterval}
                       onClose={toggleSettingsModal}
+                      tracks={tracks}
+                      selectedTrackId={selectedTrackId}
+                      handleTrackChange={handleTrackChange}
                     />
                   )}
                 </>

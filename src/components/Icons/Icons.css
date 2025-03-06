@@ -21,3 +21,7 @@
   .icon:hover {
     opacity: 0.7; /* Example hover effect */
   }
+
+   .close-icon:hover {
+    color: black;
+  }
