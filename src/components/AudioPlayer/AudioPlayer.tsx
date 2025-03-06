@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// AudioPlayer.tsx
+import React, { useEffect } from 'react';
 import { useAudioPlayer } from '../../hooks/useAudioPlayer/useAudioPlayer';
 import './AudioPlayer.css';
 import PauseIcon from '../Icons/PauseIcon';
@@ -7,34 +8,24 @@ import UnloopIcon from '../Icons/UnLoopIcon';
 import LoopIcon from '../Icons/LoopIcon';
 import VolumeOnIcon from '../Icons/VolumeOnIcon';
 import MutedIcon from '../Icons/MutedIcon';
+import { useAudio } from '../../contexts/AudioContext';
 
-interface AudioPlayerProps {
-  tracks: { id: string; name: string; src: string }[];
-  defaultTrackId?: string;
-}
-
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ tracks, defaultTrackId }) => {
-  // Get default track or first track
-  const [selectedTrackId, setSelectedTrackId] = useState<string>(
-    defaultTrackId || (tracks.length > 0 ? tracks[0].id : '')
-  );
+const AudioPlayer: React.FC = () => {
+  const { tracks, selectedTrackId } = useAudio();
 
   const selectedTrack = tracks.find((track) => track.id === selectedTrackId) || tracks[0];
 
   const { isPlaying, isMuted, isLoop, volume, play, pause, toggleMute, toggleLoop, setVolume } =
-    useAudioPlayer(selectedTrack.src);
+    useAudioPlayer(selectedTrack?.src || '');
+
+  // Debugging log to verify the track changes
+  useEffect(() => {
+    console.log('Selected track changed to:', selectedTrack?.name);
+  }, [selectedTrack]);
 
   const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVolume(parseFloat(event.target.value));
   };
-
-  // Load user's last selected track from localStorage
-  useEffect(() => {
-    const savedTrackId = localStorage.getItem('selectedMusicTrackId');
-    if (savedTrackId && tracks.some((track) => track.id === savedTrackId)) {
-      setSelectedTrackId(savedTrackId);
-    }
-  }, [tracks]);
 
   return (
     <div data-testid="audio-player" className="flex flex-wrap items-center space-x-2 gap-y-2">

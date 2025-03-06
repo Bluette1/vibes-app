@@ -1,25 +1,22 @@
-
+// SettingsModal.tsx
 import React from 'react';
-import './SettingsModal.css'
+import './SettingsModal.css';
 import CloseIcon from '../Icons/CloseIcon';
+import { useAudio } from '../../contexts/AudioContext';
 
 interface SettingsModalProps {
   transitionInterval: number;
   handleIntervalChange: (milliseconds: number) => void;
   onClose: () => void;
-  tracks: { id: string; name: string; src: string }[]; // Add tracks prop
-  selectedTrackId: string; // Add selectedTrackId prop
-  handleTrackChange: (trackId: string) => void; // Handler for track change
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
   transitionInterval,
   handleIntervalChange,
   onClose,
-  tracks,
-  selectedTrackId,
-  handleTrackChange,
 }) => {
+  const { tracks, selectedTrackId, selectTrack } = useAudio();
+
   return (
     <div className="settings-modal">
       <h3>Transition Interval</h3>
@@ -45,14 +42,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       </div>
       <div className="current-interval">Current: {transitionInterval / 1000}s</div>
 
-      <h3>Select Music Track</h3>
+      <h3 className="pt-7">Select Music Track</h3>
       <select
         value={selectedTrackId}
-        onChange={(e) => handleTrackChange(e.target.value)}
+        onChange={(e) => selectTrack(e.target.value)}
         className="track-select"
       >
         {tracks.map((track) => (
-          <option key={track.id} value={track.id}>
+          <option className="track-select-option" key={track.id} value={track.id}>
             {track.name}
           </option>
         ))}

@@ -90,60 +90,67 @@
   color: #666;
 }
 
-
-/* ---- */
 .settings-modal {
-    position: relative;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .track-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-    transition: border-color 0.3s;
-    font-size: 16px;
-  }
-  
-  .track-select:focus {
-    border-color: #66afe9;
-    outline: none;
-    background-color: white;
-  }
-  
-  .interval-buttons button {
-    margin-right: 10px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #e0e0e0;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .interval-buttons button.active {
-    background-color: #66afe9; /* Active button color */
-    color: white;
-  }
-  
-  .interval-buttons button:hover {
-    background-color: #d4d4d4;
-  }
-  
-  .close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #333;
-  }
-  
-  .close-icon:hover {
-    color: black;
-  }
+  position: relative;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.track-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.track-select:focus {
+  border-color: #66afe9;
+  outline: none;
+  background-color: white;
+  font-size: 14px;
+}
+
+.track-select-option {
+  padding: 20px;
+  font-weight: 600;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.interval-buttons button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.interval-buttons button.active {
+  background-color: #66afe9; /* Active button color */
+  color: white;
+}
+
+.interval-buttons button:hover {
+  background-color: #d4d4d4;
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #333;
+}
+
+.close-icon:hover {
+  color: black;
+}
