@@ -1,5 +1,4 @@
-// SettingsModal.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import './SettingsModal.css';
 import CloseIcon from '../Icons/CloseIcon';
 import { useAudio } from '../../contexts/AudioContext';
@@ -16,6 +15,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
 }) => {
   const { tracks, selectedTrackId, selectTrack } = useAudio();
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState(selectedTrackId);
+
+  const handleTrackSelect = (trackId: string) => {
+    selectTrack(trackId);
+    setSelectedTrack(trackId);
+    setIsOpen(false);
+  };
 
   return (
     <div className="settings-modal">
@@ -43,17 +50,24 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       <div className="current-interval">Current: {transitionInterval / 1000}s</div>
 
       <h3 className="pt-7">Select Music Track</h3>
-      <select
-        value={selectedTrackId}
-        onChange={(e) => selectTrack(e.target.value)}
-        className="track-select"
-      >
-        {tracks.map((track) => (
-          <option className="track-select-option" key={track.id} value={track.id}>
-            {track.name}
-          </option>
-        ))}
-      </select>
+      <div className="custom-dropup">
+        <div className="dropup-header" onClick={() => setIsOpen(!isOpen)}>
+          {tracks.find((track) => track.id === selectedTrack)?.name || 'Select a track'}
+        </div>
+        {isOpen && (
+          <div className="dropup-list">
+            {tracks.map((track) => (
+              <div
+                key={track.id}
+                className="dropup-item"
+                onClick={() => handleTrackSelect(track.id)}
+              >
+                {track.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <span onClick={onClose} role="button" aria-label="Close settings modal">
         <CloseIcon />
