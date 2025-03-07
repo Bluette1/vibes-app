@@ -1,45 +1,98 @@
-import { useState, useEffect } from 'react';
+// hooks/useAudioPlayer/useAudioPlayer.ts
+import { useState, useEffect, useRef } from 'react';
 
-export const useAudioPlayer = (src: string) => {
+export const useAudioPlayer = (audioSrc: string) => {
+  // Get initial volume from localStorage or default to 0.5
   const initialVolume = () => {
     const savedVolume = localStorage.getItem('audioPlayerVolume');
-    return savedVolume ? parseFloat(savedVolume) : 1;
+    return savedVolume ? parseFloat(savedVolume) : 0.5;
   };
 
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isLoop, setIsLoop] = useState<boolean>(false);
-  const [volume, setVolume] = useState<number>(initialVolume());
-  const [audio] = useState<HTMLAudioElement>(new Audio(src));
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isLoop, setIsLoop] = useState(false);
+  const [volume, setVolume] = useState(initialVolume());
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Initialize audio element
   useEffect(() => {
-    audio.volume = volume;
-  }, [volume, audio]);
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
 
+    // Clean up function to pause audio when component unmounts
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  // Handle changes to the audio source
   useEffect(() => {
-    audio.loop = isLoop;
-  }, [isLoop, audio]);
+    if (audioRef.current && audioSrc) {
+      // Store the current playing state
+      const wasPlaying = !audioRef.current.paused;
+
+      // Update the audio source
+      audioRef.current.src = audioSrc;
+
+      // Apply current settings
+      audioRef.current.loop = isLoop;
+      audioRef.current.volume = volume;
+      audioRef.current.muted = isMuted;
+
+      // If it was playing before, play the new track
+      if (wasPlaying) {
+        audioRef.current
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch((error) => {
+            console.error('Error playing audio:', error);
+            setIsPlaying(false);
+          });
+      }
+    }
+  }, [audioSrc, isLoop, volume, isMuted]);
+
+  // Apply audio settings when they change
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.loop = isLoop;
+      audioRef.current.volume = volume;
+      audioRef.current.muted = isMuted;
+    }
+  }, [isLoop, volume, isMuted]);
 
   const play = () => {
-    audio.play();
-    setIsPlaying(true);
+    if (audioRef.current && audioSrc) {
+      audioRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch((error) => {
+          console.error('Error playing audio:', error);
+          setIsPlaying(false);
+        });
+    }
   };
 
   const pause = () => {
-    audio.pause();
-    setIsPlaying(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
   };
 
   const toggleMute = () => {
-    audio.muted = !isMuted;
     setIsMuted(!isMuted);
   };
 
   const toggleLoop = () => {
     setIsLoop(!isLoop);
-  }
+  };
 
   const setVolumeAndSave = (newVolume: number) => {
+    // Save to localStorage
     localStorage.setItem('audioPlayerVolume', newVolume.toString());
     setVolume(newVolume);
   };
