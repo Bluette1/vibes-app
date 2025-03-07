@@ -2,10 +2,16 @@
 import { useState, useEffect, useRef } from 'react';
 
 export const useAudioPlayer = (audioSrc: string) => {
+  // Get initial volume from localStorage or default to 0.5
+  const initialVolume = () => {
+    const savedVolume = localStorage.getItem('audioPlayerVolume');
+    return savedVolume ? parseFloat(savedVolume) : 0.5;
+  };
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoop, setIsLoop] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(initialVolume());
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio element
@@ -47,7 +53,7 @@ export const useAudioPlayer = (audioSrc: string) => {
           });
       }
     }
-  }, [audioSrc]);
+  }, [audioSrc, isLoop, volume, isMuted]);
 
   // Apply audio settings when they change
   useEffect(() => {
@@ -85,6 +91,12 @@ export const useAudioPlayer = (audioSrc: string) => {
     setIsLoop(!isLoop);
   };
 
+  const setVolumeAndSave = (newVolume: number) => {
+    // Save to localStorage
+    localStorage.setItem('audioPlayerVolume', newVolume.toString());
+    setVolume(newVolume);
+  };
+
   return {
     isPlaying,
     isMuted,
@@ -94,6 +106,6 @@ export const useAudioPlayer = (audioSrc: string) => {
     pause,
     toggleMute,
     toggleLoop,
-    setVolume,
+    setVolume: setVolumeAndSave,
   };
 };

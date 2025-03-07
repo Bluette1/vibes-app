@@ -81,7 +81,9 @@ const ImageRingBook: React.FC<ImageRingBookProps> = ({ images, transitionInterva
     <div className="ring-book-container">
       <div className="ring-book">
         <div className="ring-holes">
-          {[...Array(5)].map((_, index) => <div key={index} className="ring"></div>)}
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="ring"></div>
+          ))}
         </div>
 
         <div className={`book-page ${isFlipping ? 'flipping' : ''}`}>

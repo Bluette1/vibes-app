@@ -20,11 +20,20 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [transitionInterval, setTransitionInterval] = useState<number>(10000); // Default interval
+  // Get saved interval from localStorage or use 10000 as default
+  const [transitionInterval, setTransitionInterval] = useState(() => {
+    const savedInterval = localStorage.getItem('transitionInterval');
+    return savedInterval ? parseInt(savedInterval) : 10000; // Default interval
+  });
+
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false); // State for settings modal
 
   const handleOpen = () => {
     setIsOpen(true);
+  };
+
+  const toggleSettingsModal = () => {
+    setIsSettingsModalOpen(!isSettingsModalOpen);
   };
 
   useEffect(() => {
@@ -52,9 +61,10 @@ const Home: React.FC = () => {
     fetchTracks();
   }, []);
 
-  const toggleSettingsModal = () => {
-    setIsSettingsModalOpen(!isSettingsModalOpen);
-  };
+  // Save interval to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('transitionInterval', transitionInterval.toString());
+  }, [transitionInterval]);
 
   return (
     <AudioProvider initialTracks={tracks}>
