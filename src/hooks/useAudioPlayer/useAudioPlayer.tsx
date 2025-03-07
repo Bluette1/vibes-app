@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
 
 export const useAudioPlayer = (src: string) => {
+  const initialVolume = () => {
+    const savedVolume = localStorage.getItem('audioPlayerVolume');
+    return savedVolume ? parseFloat(savedVolume) : 1;
+  };
+
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isLoop, setIsLoop] = useState<boolean>(false);
-  const [volume, setVolume] = useState<number>(1);
+  const [volume, setVolume] = useState<number>(initialVolume());
   const [audio] = useState<HTMLAudioElement>(new Audio(src));
 
   useEffect(() => {
@@ -30,11 +35,12 @@ export const useAudioPlayer = (src: string) => {
     setIsMuted(!isMuted);
   };
 
-    const toggleLoop = () => {
-        setIsLoop(!isLoop);
-    }
+  const toggleLoop = () => {
+    setIsLoop(!isLoop);
+  }
 
   const setVolumeAndSave = (newVolume: number) => {
+    localStorage.setItem('audioPlayerVolume', newVolume.toString());
     setVolume(newVolume);
   };
 
