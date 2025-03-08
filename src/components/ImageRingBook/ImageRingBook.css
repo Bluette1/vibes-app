@@ -140,3 +140,14 @@
   height: 1.5em;
   color: #4a5568;
 }
+
+/* Media Queries for Responsive Design */
+@media (max-width: 400px) {
+  .ring-holes {
+    display: none; /* Hide ring holes */
+  }
+
+  .ring {
+    display: none; /* Hide rings */
+  }
+}
