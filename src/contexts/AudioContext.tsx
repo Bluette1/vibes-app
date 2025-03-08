@@ -25,7 +25,6 @@ export const AudioProvider: React.FC<{ children: React.ReactNode; initialTracks?
 
   // Initialize with localStorage or first track
   useEffect(() => {
-    console.log('TRACKS))))))))))', tracks);
     if (tracks.length > 0) {
       const savedTrackId = localStorage.getItem('selectedMusicTrackId');
       if (savedTrackId && tracks.some((track) => track.id === savedTrackId)) {
