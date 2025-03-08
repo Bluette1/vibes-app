@@ -20,28 +20,22 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Get saved interval from localStorage or use 10000 as default
   const [transitionInterval, setTransitionInterval] = useState(() => {
     const savedInterval = localStorage.getItem('transitionInterval');
     return savedInterval ? parseInt(savedInterval) : 10000; // Default interval
   });
 
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false); // State for settings modal
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
 
-  const handleOpen = () => {
-    setIsOpen(true);
-  };
+  const handleOpen = () => setIsOpen(true);
 
-  const toggleSettingsModal = () => {
-    setIsSettingsModalOpen(!isSettingsModalOpen);
-  };
+  const toggleSettingsModal = () => setIsSettingsModalOpen(!isSettingsModalOpen);
 
   useEffect(() => {
     const fetchTracks = async () => {
       setIsLoading(true);
       try {
         const data = await getAudios();
-
         const formattedTracks = data.map((item) => ({
           id: item.id.toString(),
           name: item.title,
@@ -61,7 +55,6 @@ const Home: React.FC = () => {
     fetchTracks();
   }, []);
 
-  // Save interval to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('transitionInterval', transitionInterval.toString());
   }, [transitionInterval]);
@@ -89,20 +82,17 @@ const Home: React.FC = () => {
             ) : (
               <>
                 <AudioPlayer />
-
                 <section className="flex py-5">
-                  <>
-                    <button onClick={toggleSettingsModal} className="settings-button">
-                      ⚙️
-                    </button>
-                    {isSettingsModalOpen && (
-                      <SettingsModal
-                        transitionInterval={transitionInterval}
-                        handleIntervalChange={setTransitionInterval}
-                        onClose={toggleSettingsModal}
-                      />
-                    )}
-                  </>
+                  <button onClick={toggleSettingsModal} className="settings-button">
+                    ⚙️
+                  </button>
+                  {isSettingsModalOpen && (
+                    <SettingsModal
+                      transitionInterval={transitionInterval}
+                      handleIntervalChange={setTransitionInterval}
+                      onClose={toggleSettingsModal}
+                    />
+                  )}
                 </section>
               </>
             )}

@@ -111,3 +111,14 @@
   color: #666;
   margin-bottom: 2rem;
 }
+
+/* Media Queries for Responsive Design */
+@media (max-width: 400px) {
+  .ring-holes {
+    display: none; /* Hide ring holes */
+  }
+
+  .ring {
+    display: none; /* Hide rings */
+  }
+}
