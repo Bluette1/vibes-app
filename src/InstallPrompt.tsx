@@ -5,7 +5,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const InstallPrompt = () => {
+const InstallPrompt: React.FC = () => {
   useEffect(() => {
     let deferredPrompt: BeforeInstallPromptEvent | null = null;
 
