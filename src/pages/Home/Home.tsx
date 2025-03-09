@@ -9,6 +9,7 @@ import { getAudios, getUserPreferences, saveUserPreferences } from '../../utils/
 import SettingsModal from '../../components/SettingsModal/SettingsModal';
 import { AudioProvider } from '../../contexts/AudioContext';
 import { useAuth } from '../../contexts/AuthContext';
+import Spinner from '../../components/Spinner/Spinner';
 
 interface Track {
   id: string;
@@ -127,7 +128,7 @@ const Home: React.FC = () => {
           <>
             {isLoading ? (
               <div className="mt-4 text-center">
-                <p>Loading audio tracks...</p>
+                <Spinner />
               </div>
             ) : error ? (
               <div className="mt-4 text-center">
