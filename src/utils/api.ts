@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // utils/api.ts
 import axios from 'axios';
 
@@ -12,7 +13,7 @@ interface AudioResponse {
   url: string;
 }
 
-const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const baseUrl = import.meta.env.VITE_baseUrl || 'http://localhost:3000';
 
 export const getImages = async (): Promise<ImageResponse[]> => {
   const url = `${baseUrl}/api/images`;
@@ -54,4 +55,95 @@ export const getAudios = async (): Promise<AudioResponse[]> => {
   cache.put(url, new Response(JSON.stringify(data)));
 
   return data;
+};
+
+interface RegisterResponse {
+  token: string;
+  resource_owner: {
+    id: number;
+    email: string;
+  };
+}
+
+interface LoginResponse {
+  token: string;
+  resource_owner: {
+    id: number;
+    email: string;
+  };
+}
+
+export const register = async (
+  email: string,
+  password: string,
+  name: string
+): Promise<RegisterResponse> => {
+  try {
+    const response = await axios.post<RegisterResponse>(`${baseUrl}/users/tokens/sign_up`, {
+      email,
+      password,
+      name,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Registration failed');
+  }
+};
+
+export const login = async (email: string, password: string): Promise<LoginResponse> => {
+  try {
+    const response = await axios.post<LoginResponse>(`${baseUrl}/users/tokens/sign_in`, {
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Login failed');
+  }
+};
+
+interface UserPreferences {
+  preferences: {
+    id: number;
+    user_id: number;
+    volume: number;
+    selected_track: string;
+    image_transition_interval: number;
+    created_at: string;
+    updated_at: string;
+  };
+}
+
+export const getUserPreferences = async (token: string): Promise<UserPreferences> => {
+  try {
+    const response = await axios.get<UserPreferences>(`${baseUrl}/user_preferences`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch user preferences');
+  }
+};
+
+export const saveUserPreferences = async (
+  token: string,
+  preferences: UserPreferences
+): Promise<void> => {
+  try {
+    await axios.post(
+      `${baseUrl}/user_preferences`,
+      { preferences },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to save user preferences');
+  }
 };

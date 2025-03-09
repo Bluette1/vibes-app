@@ -1,12 +1,15 @@
-// Home.tsx
+// pages/Home/Home.tsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AudioPlayer from '../../components/AudioPlayer/AudioPlayer';
 import ImageRingBook from '../../components/ImageRingBook/ImageRingBook';
 import RingBookCover from '../../components/RingBookCover/RingBookCover';
 import focusedAudio from '../../assets/audio/focused.mp3';
-import { getAudios } from '../../utils/api';
+import { getAudios, getUserPreferences, saveUserPreferences } from '../../utils/api';
 import SettingsModal from '../../components/SettingsModal/SettingsModal';
 import { AudioProvider } from '../../contexts/AudioContext';
+import { useAuth } from '../../contexts/AuthContext';
+import ProfileIcon from '../../components/Icons/ProfileIcon';
 
 interface Track {
   id: string;
@@ -15,6 +18,9 @@ interface Track {
 }
 
 const Home: React.FC = () => {
+  const { isAuthenticated, token, userPreferences, setUserPreferences } = useAuth();
+  const navigate = useNavigate();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -30,6 +36,11 @@ const Home: React.FC = () => {
   const handleOpen = () => setIsOpen(true);
 
   const toggleSettingsModal = () => setIsSettingsModalOpen(!isSettingsModalOpen);
+
+  // Handle login button click
+  const handleLoginClick = () => {
+    navigate('/auth');
+  };
 
   useEffect(() => {
     const fetchTracks = async () => {
@@ -55,9 +66,56 @@ const Home: React.FC = () => {
     fetchTracks();
   }, []);
 
+  // Fetch user preferences if authenticated
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      const fetchUserPreferences = async () => {
+        try {
+          const data = await getUserPreferences(token);
+          setUserPreferences(data.preferences);
+
+          // Update local state
+          setTransitionInterval(data.preferences.image_transition_interval);
+          localStorage.setItem(
+            'transitionInterval',
+            data.preferences.image_transition_interval.toString()
+          );
+        } catch (err) {
+          console.error('Failed to fetch user preferences:', err);
+        }
+      };
+
+      fetchUserPreferences();
+    }
+  }, [isAuthenticated, token, setUserPreferences]);
+
+  // Save transition interval to user preferences if authenticated
   useEffect(() => {
     localStorage.setItem('transitionInterval', transitionInterval.toString());
-  }, [transitionInterval]);
+
+    if (isAuthenticated && token && userPreferences) {
+      const savePrefs = async () => {
+        try {
+          const updatedPrefs = {
+            ...userPreferences,
+            image_transition_interval: transitionInterval,
+          };
+
+          await saveUserPreferences(token, { preferences: updatedPrefs });
+          setUserPreferences(updatedPrefs);
+        } catch (err) {
+          console.error('Failed to save user preferences:', err);
+        }
+      };
+
+      // Debounce the save operation
+      const debounceTimer = setTimeout(() => {
+        savePrefs();
+      }, 1000);
+
+      return () => clearTimeout(debounceTimer);
+    }
+  }, [transitionInterval, isAuthenticated, token, userPreferences, setUserPreferences]);
 
   return (
     <AudioProvider initialTracks={tracks}>
@@ -70,6 +128,19 @@ const Home: React.FC = () => {
 
         {isOpen && (
           <>
+            <div className="user-auth-status mt-2 mb-2">
+              {isAuthenticated ? (
+                <div className="text-green-600">✓ Preferences are being saved to your account</div>
+              ) : (
+                <button
+                  onClick={handleLoginClick}
+                  className="mb-2 px-2 py-2  text-gray-500 rounded  flex items-center"
+                >
+                  <ProfileIcon />
+                </button>
+              )}
+            </div>
+
             {isLoading ? (
               <div className="mt-4 text-center">
                 <p>Loading audio tracks...</p>
