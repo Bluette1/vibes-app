@@ -128,19 +128,6 @@ const Home: React.FC = () => {
 
         {isOpen && (
           <>
-            <div className="user-auth-status mt-2 mb-2">
-              {isAuthenticated ? (
-                <div className="text-green-600">✓ Preferences are being saved to your account</div>
-              ) : (
-                <button
-                  onClick={handleLoginClick}
-                  className="mb-2 px-2 py-2  text-gray-500 rounded  flex items-center"
-                >
-                  <ProfileIcon />
-                </button>
-              )}
-            </div>
-
             {isLoading ? (
               <div className="mt-4 text-center">
                 <p>Loading audio tracks...</p>
@@ -167,6 +154,24 @@ const Home: React.FC = () => {
                 </section>
               </>
             )}
+            <div className="user-auth-status mb-2">
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLoginClick}
+                  className="mb-2 px-2 text-gray-500 rounded  flex items-center"
+                >
+                  ✓
+                  <ProfileIcon />
+                </button>
+              ) : (
+                <button
+                  onClick={handleLoginClick}
+                  className="mb-2 px-2 py-2  text-gray-500 rounded  flex items-center"
+                >
+                  <ProfileIcon />
+                </button>
+              )}
+            </div>
           </>
         )}
       </div>

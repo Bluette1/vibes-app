@@ -13,10 +13,10 @@ interface UserPreferences {
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: any | null;
+  user: unknown | null;
   token: string | null;
   userPreferences: UserPreferences | null;
-  login: (token: string, user: any) => void;
+  login: (token: string, user: unknown) => void;
   logout: () => void;
   setUserPreferences: (prefs: UserPreferences) => void;
 }
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<unknown | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
 
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (token: string, user: any) => {
+  const login = (token: string, user: unknown) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     setToken(token);
