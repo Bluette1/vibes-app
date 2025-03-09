@@ -11,12 +11,16 @@ interface UserPreferences {
   updated_at: string;
 }
 
+interface User {
+  email: string;
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: unknown | null;
+  user: User | null;
   token: string | null;
   userPreferences: UserPreferences | null;
-  login: (token: string, user: unknown) => void;
+  login: (token: string, user: User) => void;
   logout: () => void;
   setUserPreferences: (prefs: UserPreferences) => void;
 }
@@ -25,7 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<unknown | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
 
@@ -34,19 +38,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
     const storedPreferences = localStorage.getItem('userPreferences');
-    
+
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
       setIsAuthenticated(true);
-      
+
       if (storedPreferences) {
         setUserPreferences(JSON.parse(storedPreferences));
       }
     }
   }, []);
 
-  const login = (token: string, user: unknown) => {
+  const login = (token: string, user: User | null) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     setToken(token);
@@ -69,15 +73,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        isAuthenticated, 
-        user, 
-        token, 
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user,
+        token,
         userPreferences,
-        login, 
+        login,
         logout,
-        setUserPreferences: updateUserPreferences
+        setUserPreferences: updateUserPreferences,
       }}
     >
       {children}

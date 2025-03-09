@@ -1,0 +1,208 @@
+/* pages/Profile/Profile.css */
+.profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  
+  .ring-book-profile {
+    position: relative;
+    width: 500px;
+    min-height: 600px;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+  }
+  
+  .ring-holes {
+    position: absolute;
+    left: 10px;
+    top: 40px;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 10;
+  }
+  
+  .ring {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #aaa;
+    border: 2px solid #888;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .profile-content {
+    margin-left: 20px;
+    width: 90%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .app-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .avatar-container {
+    margin-bottom: 20px;
+  }
+  
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #4a6fa5;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .user-details {
+    width: 100%;
+  }
+  
+  .detail {
+    display: flex;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+  }
+  
+  .label {
+    font-weight: 600;
+    min-width: 120px;
+    color: #555;
+  }
+  
+  .value {
+    flex-grow: 1;
+    color: #333;
+  }
+  
+  .preferences-section {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f5f7fa;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+  
+  .preferences-section h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+  }
+  
+  .preference-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .preference {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+  }
+  
+  .pref-label {
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .pref-value {
+    font-weight: 600;
+    color: #4a6fa5;
+  }
+  
+  .no-preferences {
+    color: #888;
+    font-style: italic;
+  }
+  
+  .profile-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+  
+  .back-button, .logout-button {
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .back-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+  
+  .back-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .logout-button {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+  }
+  
+  .logout-button:hover {
+    background-color: #c53030;
+  }
+  
+  /* Media Queries for Responsive Design */
+  @media (max-width: 550px) {
+    .ring-book-profile {
+      width: 100%;
+    }
+    
+    .ring-holes {
+      display: none;
+    }
+    
+    .profile-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .back-button, .logout-button {
+      width: 100%;
+    }
+  }

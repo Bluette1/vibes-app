@@ -1,15 +1,14 @@
 // pages/Home/Home.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import AudioPlayer from '../../components/AudioPlayer/AudioPlayer';
 import ImageRingBook from '../../components/ImageRingBook/ImageRingBook';
 import RingBookCover from '../../components/RingBookCover/RingBookCover';
+import ProfileIcon from '../../components/Icons/ProfileIcon/ProfileIcon';
 import focusedAudio from '../../assets/audio/focused.mp3';
 import { getAudios, getUserPreferences, saveUserPreferences } from '../../utils/api';
 import SettingsModal from '../../components/SettingsModal/SettingsModal';
 import { AudioProvider } from '../../contexts/AudioContext';
 import { useAuth } from '../../contexts/AuthContext';
-import ProfileIcon from '../../components/Icons/ProfileIcon';
 
 interface Track {
   id: string;
@@ -19,7 +18,6 @@ interface Track {
 
 const Home: React.FC = () => {
   const { isAuthenticated, token, userPreferences, setUserPreferences } = useAuth();
-  const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -36,11 +34,6 @@ const Home: React.FC = () => {
   const handleOpen = () => setIsOpen(true);
 
   const toggleSettingsModal = () => setIsSettingsModalOpen(!isSettingsModalOpen);
-
-  // Handle login button click
-  const handleLoginClick = () => {
-    navigate('/auth');
-  };
 
   useEffect(() => {
     const fetchTracks = async () => {
@@ -119,7 +112,11 @@ const Home: React.FC = () => {
 
   return (
     <AudioProvider initialTracks={tracks}>
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="absolute top-4 right-4">
+          <ProfileIcon />
+        </div>
+
         {isOpen ? (
           <ImageRingBook images={[]} transitionInterval={transitionInterval} />
         ) : (
@@ -154,24 +151,6 @@ const Home: React.FC = () => {
                 </section>
               </>
             )}
-            <div className="user-auth-status mb-2">
-              {isAuthenticated ? (
-                <button
-                  onClick={handleLoginClick}
-                  className="mb-2 px-2 text-gray-500 rounded  flex items-center"
-                >
-                  ✓
-                  <ProfileIcon />
-                </button>
-              ) : (
-                <button
-                  onClick={handleLoginClick}
-                  className="mb-2 px-2 py-2  text-gray-500 rounded  flex items-center"
-                >
-                  <ProfileIcon />
-                </button>
-              )}
-            </div>
           </>
         )}
       </div>

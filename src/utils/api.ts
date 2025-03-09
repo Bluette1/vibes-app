@@ -13,7 +13,7 @@ interface AudioResponse {
   url: string;
 }
 
-const baseUrl = import.meta.env.VITE_baseUrl || 'http://localhost:3000';
+const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const getImages = async (): Promise<ImageResponse[]> => {
   const url = `${baseUrl}/api/images`;
@@ -116,7 +116,7 @@ interface UserPreferences {
 
 export const getUserPreferences = async (token: string): Promise<UserPreferences> => {
   try {
-    const response = await axios.get<UserPreferences>(`${baseUrl}/user_preferences`, {
+    const response = await axios.get<UserPreferences>(`${baseUrl}/api/user_preferences`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
