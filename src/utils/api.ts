@@ -134,8 +134,8 @@ export const saveUserPreferences = async (
 ): Promise<void> => {
   try {
     await axios.post(
-      `${baseUrl}/user_preferences`,
-      { preferences },
+      `${baseUrl}/api/user_preferences`,
+      preferences,
       {
         headers: {
           Authorization: `Bearer ${token}`,

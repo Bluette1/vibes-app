@@ -1,17 +1,20 @@
 .spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; /* Full height for centering */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner-image {
+  width: 100px;
+  height: 100px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  
-  .spinner-image {
-    width: 100px; /* Adjust size as needed */
-    height: 100px; /* Adjust size as needed */
-    animation: spin 2s linear infinite;
+  100% {
+    transform: rotate(360deg);
   }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+}
