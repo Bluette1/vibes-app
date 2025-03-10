@@ -25,8 +25,10 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [debugMessage, setDebugMessage] = useState<string>('');
-  
+  const [initialSelectedTrackId, setInitialSelectedTrackId] = useState<string | undefined>(
+    undefined
+  );
+
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitializedRef = useRef<boolean>(false);
 
@@ -36,7 +38,7 @@ const Home: React.FC = () => {
       const savedInterval = localStorage.getItem('transitionInterval');
       return savedInterval ? parseInt(savedInterval) : 10000; // Default interval
     } catch (e) {
-      console.error("Error parsing localStorage interval:", e);
+      console.error('Error parsing localStorage interval:', e);
       return 10000;
     }
   });
@@ -46,57 +48,62 @@ const Home: React.FC = () => {
   const handleOpen = () => setIsOpen(true);
   const toggleSettingsModal = () => setIsSettingsModalOpen(!isSettingsModalOpen);
 
-  // Memoized function to save interval to server
-  const saveIntervalToServer = useCallback(async (interval: number) => {
-    if (!isAuthenticated || !token || !userPreferences) {
-      localStorage.setItem('transitionInterval', interval.toString());
-      return;
-    }
-    
-    setIsSaving(true);
-    setDebugMessage(`Saving ${interval/1000}s to server...`);
-    
-    try {
-      const updatedPrefs = {
-        ...userPreferences,
-        image_transition_interval: interval,
-      };
+  // Memoized function to save changes to server
+  const savePreferencesToServer = useCallback(
+    async (updatedPrefs: Partial<typeof userPreferences>) => {
+      if (!isAuthenticated || !token || !userPreferences) {
+        return;
+      }
 
-      console.log('Updated preferences)))', updatedPrefs)
-      await saveUserPreferences(token, { preferences: updatedPrefs });
-      setUserPreferences(updatedPrefs);
-      
-      // Update local storage after successful server update
-      localStorage.setItem('transitionInterval', interval.toString());
-      setDebugMessage(`Successfully saved ${interval/1000}s to server`);
-    } catch (err) {
-      console.error('Failed to save user preferences:', err);
-      setDebugMessage(`Error saving to server: ${err}`);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [isAuthenticated, token, userPreferences, setUserPreferences]);
+      setIsSaving(true);
+
+      try {
+        const newPrefs = {
+          ...userPreferences,
+          ...updatedPrefs,
+        };
+
+        await saveUserPreferences(token, { preferences: newPrefs });
+        setUserPreferences(newPrefs);
+      } catch (err) {
+        console.error('Failed to save user preferences:', err);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [isAuthenticated, token, userPreferences, setUserPreferences]
+  );
 
   // Handle interval change with proper debouncing
-  const handleIntervalChange = useCallback((milliseconds: number) => {
-    // Update UI immediately
-    setTransitionInterval(milliseconds);
-    setDebugMessage(`Interval changed to ${milliseconds/1000}s, debouncing save...`);
-    
-    // Clear any pending timeout
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-    
-    // Save to localStorage immediately for local persistence
-    localStorage.setItem('transitionInterval', milliseconds.toString());
-    
-    // Debounce server save
-    saveTimeoutRef.current = setTimeout(() => {
-      saveIntervalToServer(milliseconds);
-    }, 1000);
-    
-  }, [saveIntervalToServer]);
+  const handleIntervalChange = useCallback(
+    (milliseconds: number) => {
+      // Update UI immediately
+      setTransitionInterval(milliseconds);
+
+      // Clear any pending timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Save to localStorage immediately for local persistence
+      localStorage.setItem('transitionInterval', milliseconds.toString());
+
+      // Debounce server save
+      saveTimeoutRef.current = setTimeout(() => {
+        savePreferencesToServer({ image_transition_interval: milliseconds });
+      }, 1000);
+    },
+    [savePreferencesToServer]
+  );
+
+  // Handle track selection (to be passed to AudioProvider)
+  const handleTrackSelect = useCallback(
+    async (trackId: string) => {
+      // Save to server without debouncing (since track changes are less frequent)
+      await savePreferencesToServer({ selected_track: trackId });
+    },
+    [savePreferencesToServer]
+  );
 
   // Fetch tracks
   useEffect(() => {
@@ -131,28 +138,30 @@ const Home: React.FC = () => {
           const data = await getUserPreferences(token);
           setUserPreferences(data.preferences);
 
-          // If server has a value, use it
+          // Handle interval from server
           if (data.preferences.image_transition_interval) {
             const serverInterval = data.preferences.image_transition_interval;
             setTransitionInterval(serverInterval);
             localStorage.setItem('transitionInterval', serverInterval.toString());
-            setDebugMessage(`Loaded interval ${serverInterval/1000}s from server`);
           } else {
             // If server doesn't have a value, use our current value and save to server
-            saveIntervalToServer(transitionInterval);
-            setDebugMessage(`Server had no interval, using local: ${transitionInterval/1000}s`);
+            savePreferencesToServer({ image_transition_interval: transitionInterval });
           }
-          
+
+          // Handle selected track from server
+          if (data.preferences.selected_track) {
+            setInitialSelectedTrackId(data.preferences.selected_track);
+          }
+
           isInitializedRef.current = true;
         } catch (err) {
           console.error('Failed to fetch user preferences:', err);
-          setDebugMessage(`Error fetching preferences: ${err}`);
         }
       };
 
       fetchUserPreferences();
     }
-  }, [isAuthenticated, token, setUserPreferences, saveIntervalToServer, transitionInterval]);
+  }, [isAuthenticated, token, setUserPreferences, savePreferencesToServer, transitionInterval]);
 
   // Cleanup
   useEffect(() => {
@@ -164,17 +173,18 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <AudioProvider initialTracks={tracks}>
+    <AudioProvider
+      initialTracks={tracks}
+      onTrackSelect={isAuthenticated ? handleTrackSelect : undefined}
+      initialSelectedTrackId={initialSelectedTrackId}
+    >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="absolute top-4 right-4">
           <ProfileIcon />
         </div>
 
         {isOpen ? (
-          <ImageRingBook 
-            images={[]} 
-            transitionInterval={transitionInterval} 
-          />
+          <ImageRingBook images={[]} transitionInterval={transitionInterval} />
         ) : (
           <RingBookCover onOpen={handleOpen} />
         )}
@@ -193,7 +203,7 @@ const Home: React.FC = () => {
             ) : (
               <>
                 <AudioPlayer />
-                <section className="flex flex-col py-5 items-center">
+                <section className="flex py-5">
                   <button onClick={toggleSettingsModal} className="settings-button">
                     ⚙️
                   </button>
@@ -204,9 +214,6 @@ const Home: React.FC = () => {
                       onClose={toggleSettingsModal}
                       isSaving={isSaving}
                     />
-                  )}
-                  {debugMessage && (
-                    <div className="mt-2 text-xs text-gray-500">{debugMessage}</div>
                   )}
                 </section>
               </>

@@ -16,13 +16,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   isSaving = false,
 }) => {
-  const { tracks, selectedTrackId, selectTrack } = useAudio();
+  const { tracks, selectedTrackId, selectTrack, isTrackSaving } = useAudio();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedTrack, setSelectedTrack] = useState(selectedTrackId);
 
   const handleTrackSelect = (trackId: string) => {
     selectTrack(trackId);
-    setSelectedTrack(trackId);
     setIsOpen(false);
   };
 
@@ -59,15 +57,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
       <h3 className="pt-7">Select Music Track</h3>
       <div className="custom-dropup">
-        <div className="dropup-header" onClick={() => setIsOpen(!isOpen)}>
-          {tracks.find((track) => track.id === selectedTrack)?.name || 'Select a track'}
+        <div
+          className={`dropup-header ${isTrackSaving ? 'saving' : ''}`}
+          onClick={() => !isTrackSaving && setIsOpen(!isOpen)}
+        >
+          {tracks.find((track) => track.id === selectedTrackId)?.name || 'Select a track'}
+          {isTrackSaving && <span className="ml-2 text-xs text-gray-500">(saving...)</span>}
         </div>
         {isOpen && (
           <div className="dropup-list">
             {tracks.map((track) => (
               <div
                 key={track.id}
-                className="dropup-item"
+                className={`dropup-item ${selectedTrackId === track.id ? 'active' : ''}`}
                 onClick={() => handleTrackSelect(track.id)}
               >
                 {track.name}
