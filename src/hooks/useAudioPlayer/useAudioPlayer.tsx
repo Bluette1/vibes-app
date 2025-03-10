@@ -1,7 +1,11 @@
 // hooks/useAudioPlayer/useAudioPlayer.ts
 import { useState, useEffect, useRef } from 'react';
+import { saveUserPreferences } from '../../utils/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const useAudioPlayer = (audioSrc: string) => {
+  const { isAuthenticated, token, userPreferences, setUserPreferences } = useAuth();
+
   // Get initial volume from localStorage or default to 0.5
   const initialVolume = () => {
     const savedVolume = localStorage.getItem('audioPlayerVolume');
@@ -91,7 +95,21 @@ export const useAudioPlayer = (audioSrc: string) => {
     setIsLoop(!isLoop);
   };
 
-  const setVolumeAndSave = (newVolume: number) => {
+  const setVolumeAndSave = async (newVolume: number) => {
+    if (isAuthenticated && token && userPreferences) {
+      const updatedPrefs = {
+        selected_track: userPreferences.selected_track,
+        image_transition_interval: userPreferences.image_transition_interval,
+        volume: newVolume,
+      };
+
+      try {
+        await saveUserPreferences(token, { preferences: updatedPrefs });
+        setUserPreferences({ ...userPreferences, volume: newVolume });
+      } catch (error) {
+        console.error('Failed to save user preferences', error);
+      }
+    }
     // Save to localStorage
     localStorage.setItem('audioPlayerVolume', newVolume.toString());
     setVolume(newVolume);

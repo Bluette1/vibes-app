@@ -74,7 +74,7 @@ const ImageRingBook: React.FC<ImageRingBookProps> = ({ images, transitionInterva
   };
 
   if (isLoading || loadedImages.length === 0) {
-    return <div className="loading">Loading images...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   return (

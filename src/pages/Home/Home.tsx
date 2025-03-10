@@ -1,12 +1,15 @@
-// Home.tsx
-import React, { useState, useEffect } from 'react';
+// pages/Home/Home.tsx
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AudioPlayer from '../../components/AudioPlayer/AudioPlayer';
 import ImageRingBook from '../../components/ImageRingBook/ImageRingBook';
 import RingBookCover from '../../components/RingBookCover/RingBookCover';
+import ProfileIcon from '../../components/Icons/ProfileIcon/ProfileIcon';
 import focusedAudio from '../../assets/audio/focused.mp3';
-import { getAudios } from '../../utils/api';
+import { getAudios, getUserPreferences, saveUserPreferences } from '../../utils/api';
 import SettingsModal from '../../components/SettingsModal/SettingsModal';
 import { AudioProvider } from '../../contexts/AudioContext';
+import { useAuth } from '../../contexts/AuthContext';
+import Spinner from '../../components/Spinner/Spinner';
 
 interface Track {
   id: string;
@@ -15,22 +18,94 @@ interface Track {
 }
 
 const Home: React.FC = () => {
+  const { isAuthenticated, token, userPreferences, setUserPreferences } = useAuth();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [initialSelectedTrackId, setInitialSelectedTrackId] = useState<string | undefined>(
+    undefined
+  );
 
-  const [transitionInterval, setTransitionInterval] = useState(() => {
-    const savedInterval = localStorage.getItem('transitionInterval');
-    return savedInterval ? parseInt(savedInterval) : 10000; // Default interval
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitializedRef = useRef<boolean>(false);
+
+  // Initialize from localStorage first
+  const [transitionInterval, setTransitionInterval] = useState<number>(() => {
+    try {
+      const savedInterval = localStorage.getItem('transitionInterval');
+      return savedInterval ? parseInt(savedInterval) : 10000; // Default interval
+    } catch (e) {
+      console.error('Error parsing localStorage interval:', e);
+      return 10000;
+    }
   });
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
 
   const handleOpen = () => setIsOpen(true);
-
   const toggleSettingsModal = () => setIsSettingsModalOpen(!isSettingsModalOpen);
 
+  // Memoized function to save changes to server
+  const savePreferencesToServer = useCallback(
+    async (updatedPrefs: Partial<typeof userPreferences>) => {
+      if (!isAuthenticated || !token || !userPreferences) {
+        return;
+      }
+
+      setIsSaving(true);
+
+      try {
+        const newPrefs = {
+          ...userPreferences,
+          ...updatedPrefs,
+        };
+
+        await saveUserPreferences(token, { preferences: newPrefs });
+        setUserPreferences(newPrefs);
+      } catch (err) {
+        console.error('Failed to save user preferences:', err);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [isAuthenticated, token, userPreferences, setUserPreferences]
+  );
+
+  // Handle interval change with proper debouncing
+  const handleIntervalChange = useCallback(
+    (milliseconds: number) => {
+      // Update UI immediately
+      setTransitionInterval(milliseconds);
+
+      // Clear any pending timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Save to localStorage immediately for local persistence
+      localStorage.setItem('transitionInterval', milliseconds.toString());
+
+      // Debounce server save
+      saveTimeoutRef.current = setTimeout(() => {
+        savePreferencesToServer({ image_transition_interval: milliseconds });
+      }, 1000);
+    },
+    [savePreferencesToServer]
+  );
+
+  // Handle track selection (to be passed to AudioProvider)
+  const handleTrackSelect = useCallback(
+    async (trackId: string) => {
+      // Save to server without debouncing (since track changes are less frequent)
+      await savePreferencesToServer({ selected_track: trackId });
+    },
+    [savePreferencesToServer]
+  );
+
+  // Fetch tracks
   useEffect(() => {
     const fetchTracks = async () => {
       setIsLoading(true);
@@ -55,13 +130,59 @@ const Home: React.FC = () => {
     fetchTracks();
   }, []);
 
+  // Fetch user preferences only once when authenticated
   useEffect(() => {
-    localStorage.setItem('transitionInterval', transitionInterval.toString());
-  }, [transitionInterval]);
+    if (isAuthenticated && token && !isInitializedRef.current) {
+      const fetchUserPreferences = async () => {
+        try {
+          const data = await getUserPreferences(token);
+          setUserPreferences(data.preferences);
+
+          // Handle interval from server
+          if (data.preferences.image_transition_interval) {
+            const serverInterval = data.preferences.image_transition_interval;
+            setTransitionInterval(serverInterval);
+            localStorage.setItem('transitionInterval', serverInterval.toString());
+          } else {
+            // If server doesn't have a value, use our current value and save to server
+            savePreferencesToServer({ image_transition_interval: transitionInterval });
+          }
+
+          // Handle selected track from server
+          if (data.preferences.selected_track) {
+            setInitialSelectedTrackId(data.preferences.selected_track);
+          }
+
+          isInitializedRef.current = true;
+        } catch (err) {
+          console.error('Failed to fetch user preferences:', err);
+        }
+      };
+
+      fetchUserPreferences();
+    }
+  }, [isAuthenticated, token, setUserPreferences, savePreferencesToServer, transitionInterval]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
-    <AudioProvider initialTracks={tracks}>
-      <div className="flex flex-col items-center justify-center">
+    <AudioProvider
+      initialTracks={tracks}
+      onTrackSelect={isAuthenticated ? handleTrackSelect : undefined}
+      initialSelectedTrackId={initialSelectedTrackId}
+    >
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="absolute top-4 right-4">
+          <ProfileIcon />
+        </div>
+
         {isOpen ? (
           <ImageRingBook images={[]} transitionInterval={transitionInterval} />
         ) : (
@@ -72,7 +193,7 @@ const Home: React.FC = () => {
           <>
             {isLoading ? (
               <div className="mt-4 text-center">
-                <p>Loading audio tracks...</p>
+                <Spinner />
               </div>
             ) : error ? (
               <div className="mt-4 text-center">
@@ -89,8 +210,9 @@ const Home: React.FC = () => {
                   {isSettingsModalOpen && (
                     <SettingsModal
                       transitionInterval={transitionInterval}
-                      handleIntervalChange={setTransitionInterval}
+                      handleIntervalChange={handleIntervalChange}
                       onClose={toggleSettingsModal}
+                      isSaving={isSaving}
                     />
                   )}
                 </section>
