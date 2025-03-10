@@ -4,7 +4,7 @@ import { saveUserPreferences } from '../../utils/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const useAudioPlayer = (audioSrc: string) => {
-  const { isAuthenticated, token, userPreferences } = useAuth();
+  const { isAuthenticated, token, userPreferences, setUserPreferences } = useAuth();
 
   // Get initial volume from localStorage or default to 0.5
   const initialVolume = () => {
@@ -105,6 +105,7 @@ export const useAudioPlayer = (audioSrc: string) => {
 
       try {
         await saveUserPreferences(token, { preferences: updatedPrefs });
+        setUserPreferences({ ...userPreferences, volume: newVolume });
       } catch (error) {
         console.error('Failed to save user preferences', error);
       }
