@@ -102,16 +102,18 @@ export const login = async (email: string, password: string): Promise<LoginRespo
   }
 };
 
+interface Preferences {
+  id: number;
+  user_id: number;
+  volume: number;
+  selected_track: string;
+  image_transition_interval: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface UserPreferences {
-  preferences: {
-    id: number;
-    user_id: number;
-    volume: number;
-    selected_track: string;
-    image_transition_interval: number;
-    created_at: string;
-    updated_at: string;
-  };
+  preferences: Preferences;
 }
 
 export const getUserPreferences = async (token: string): Promise<UserPreferences> => {
@@ -130,19 +132,17 @@ export const getUserPreferences = async (token: string): Promise<UserPreferences
 
 export const saveUserPreferences = async (
   token: string,
-  preferences: UserPreferences
+  preferences: {
+    preferences: Partial<Preferences>;
+  }
 ): Promise<void> => {
   try {
-    await axios.post(
-      `${baseUrl}/api/user_preferences`,
-      preferences,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    await axios.post(`${baseUrl}/api/user_preferences`, preferences, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Failed to save user preferences');
   }
