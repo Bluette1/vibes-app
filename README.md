@@ -4,6 +4,8 @@ Vibes is a meditation web application designed to enhance your mindfulness exper
 
 ![Screenshot Vibes App](./src/assets/images/vibes-app-screenshot.png)
 
+[Deployed site](https://vibes-sounds-app.netlify.app/)
+
 ## Features
 
 - **Nature Images**: Display a series of calming nature images to enhance the meditation experience.
@@ -66,8 +68,8 @@ Vibes is a meditation web application designed to enhance your mindfulness exper
 
 We welcome contributions! Please fork the repository and create a pull request with your changes.
 
-[User Stories](https://www.notion.so/User-Stories-Vibes-React-App-1abe6a4d98f280e3ac7cdf0bc4aafd65?pvs=4)
-[MVP User Stories](https://www.notion.so/MVP-User-Stories-Vibes-React-App-1abe6a4d98f2809ea876d98865c9c95f)
+- [User Stories](https://www.notion.so/User-Stories-Vibes-React-App-1abe6a4d98f280e3ac7cdf0bc4aafd65?pvs=4)
+- [MVP User Stories](https://www.notion.so/MVP-User-Stories-Vibes-React-App-1abe6a4d98f2809ea876d98865c9c95f)
 
 
 ## License
@@ -83,6 +85,9 @@ The meditation tracks in this application are sourced from:
 - [Free Music Archive](https://freemusicarchive.org/)
   - Collection of ambient and meditation music
   - License: Various Creative Commons licenses (CC BY, CC BY-SA)
+
+- [Chosic](https://www.chosic.com/free-music/piano/)
+  - Free piano background music downloads
 - [UnSplash](https://unsplash.com/)
   - Free nature images and visuals
 - [PicJumbo](https://picjumbo.com/)
