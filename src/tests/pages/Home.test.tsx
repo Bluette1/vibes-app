@@ -117,7 +117,7 @@ describe('Home Component', () => {
     });
     vi.mocked(saveUserPreferences).mockResolvedValue({ success: true });
   });
-  
+
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -231,7 +231,7 @@ describe('Home Component', () => {
 
   test.skip('changes transition interval and saves to localStorage and server', async () => {
     vi.useFakeTimers();
-    
+
     // Mock authenticated user
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
@@ -267,10 +267,10 @@ describe('Home Component', () => {
         preferences: { selected_track: '1', image_transition_interval: 20000 },
       });
     });
-    
+
     vi.useRealTimers();
   });
-  
+
   test.skip('debounces saving interval changes to server', async () => {
     vi.useFakeTimers();
 
@@ -305,11 +305,14 @@ describe('Home Component', () => {
 
     // Now it should have called the server
     await waitFor(() => {
-      expect(saveUserPreferences).toHaveBeenCalledWith('fake-token', expect.objectContaining({
-        preferences: expect.objectContaining({ 
-          image_transition_interval: 20000 
+      expect(saveUserPreferences).toHaveBeenCalledWith(
+        'fake-token',
+        expect.objectContaining({
+          preferences: expect.objectContaining({
+            image_transition_interval: 20000,
+          }),
         })
-      }));
+      );
     });
 
     vi.useRealTimers();

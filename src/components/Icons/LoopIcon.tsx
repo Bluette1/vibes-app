@@ -1,6 +1,5 @@
 import * as React from 'react';
-import './Icons.css'
-
+import './Icons.css';
 
 const LoopIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg

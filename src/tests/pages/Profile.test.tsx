@@ -1,19 +1,19 @@
 // src/tests/pages/Profile.test.tsx
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 import Profile from '../../pages/Profile/Profile';
 import { useAuth } from '../../contexts/AuthContext';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 // Mock the useAuth hook
 vi.mock('../../contexts/AuthContext');
 
 // Mock react-router-dom module
-vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock('react-router-dom', () => {
   return {
-    ...actual,
-    useNavigate: vi.fn(), // Mock useNavigate
+    useNavigate: vi.fn(),
+    MemoryRouter: ({ children }) => <div data-testid="memory-router">{children}</div>,
   };
 });
 
@@ -33,7 +33,7 @@ describe('Profile Component', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   test('renders user email', () => {
@@ -79,10 +79,9 @@ describe('Profile Component', () => {
     expect(screen.getByText('No saved preferences found.')).toBeInTheDocument();
   });
 
-  test.skip('handles back to home button click', () => {
+  test('handles back to home button click', () => {
     const navigate = vi.fn();
-    const { useNavigate } = require('react-router-dom');
-    useNavigate.mockReturnValue(navigate); // Use the mocked useNavigate
+    (useNavigate as jest.Mock).mockReturnValue(navigate); // Use the mocked useNavigate
 
     render(
       <MemoryRouter>
@@ -94,11 +93,10 @@ describe('Profile Component', () => {
     expect(navigate).toHaveBeenCalledWith('/');
   });
 
-  test.skip('handles logout button click', () => {
+  test('handles logout button click', () => {
     const { logout } = mockUseAuth();
     const navigate = vi.fn();
-    const { useNavigate } = require('react-router-dom');
-    useNavigate.mockReturnValue(navigate); // Use the mocked useNavigate
+    (useNavigate as jest.Mock).mockReturnValue(navigate); // Use the mocked useNavigate
 
     render(
       <MemoryRouter>

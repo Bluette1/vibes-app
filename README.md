@@ -71,7 +71,6 @@ We welcome contributions! Please fork the repository and create a pull request w
 - [User Stories](https://www.notion.so/User-Stories-Vibes-React-App-1abe6a4d98f280e3ac7cdf0bc4aafd65?pvs=4)
 - [MVP User Stories](https://www.notion.so/MVP-User-Stories-Vibes-React-App-1abe6a4d98f2809ea876d98865c9c95f)
 
-
 ## License
 
 This project is licensed under the MIT License.
@@ -83,6 +82,7 @@ The meditation tracks in this application are sourced from:
 - [The Cyber Hymnal](https://hymnary.org/hymnal/CYBER)
   - Christian hymns from many denominations and languages.
 - [Free Music Archive](https://freemusicarchive.org/)
+
   - Collection of ambient and meditation music
   - License: Various Creative Commons licenses (CC BY, CC BY-SA)
 
