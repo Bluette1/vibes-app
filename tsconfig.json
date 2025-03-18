@@ -1,4 +1,5 @@
 {
+  "exclude": ["**/*.test.tsx", "**/*.test.tsd", "**/*.spec.ts"],
   "files": [],
   "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }

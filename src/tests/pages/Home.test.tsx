@@ -14,7 +14,9 @@ vi.mock('../../utils/api', () => ({
 }));
 
 vi.mock('../../contexts/AudioContext', () => ({
-  AudioProvider: ({ children }) => <div data-testid="audio-provider">{children}</div>,
+  AudioProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="audio-provider">{children}</div>
+  ),
 }));
 
 vi.mock('../../contexts/AuthContext', () => ({
@@ -33,7 +35,7 @@ vi.mock('../../components/ImageRingBook/ImageRingBook', () => ({
 }));
 
 vi.mock('../../components/RingBookCover/RingBookCover', () => ({
-  default: ({ onOpen }) => (
+  default: ({ onOpen }: { onOpen: () => void }) => (
     <button data-testid="ring-book-cover" onClick={onOpen}>
       Ring Book Cover
     </button>
@@ -45,7 +47,17 @@ vi.mock('../../components/Icons/ProfileIcon/ProfileIcon', () => ({
 }));
 
 vi.mock('../../components/SettingsModal/SettingsModal', () => ({
-  default: ({ transitionInterval, handleIntervalChange, onClose, isSaving }) => (
+  default: ({
+    transitionInterval,
+    handleIntervalChange,
+    onClose,
+    isSaving,
+  }: {
+    transitionInterval: number;
+    handleIntervalChange: (interval: number) => void;
+    onClose: () => void;
+    isSaving: boolean;
+  }) => (
     <div data-testid="settings-modal">
       <p>Interval: {transitionInterval}</p>
       <p>Saving: {isSaving ? 'true' : 'false'}</p>
@@ -110,9 +122,15 @@ describe('Home Component', () => {
     ]);
 
     vi.mocked(getUserPreferences).mockResolvedValue({
+      id: '1',
+      user_id: '1',
+      volume: 0.5,
+      created_at: new Date(),
+      updated_at: new Date(),
+
       preferences: {
         image_transition_interval: 15000,
-        selected_track: '1',
+        selected_track: 1,
       },
     });
     vi.mocked(saveUserPreferences).mockResolvedValue({ success: true });
@@ -173,7 +191,15 @@ describe('Home Component', () => {
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       token: 'fake-token',
-      userPreferences: {},
+      userPreferences: {
+        id: 1,
+        user_id: 1,
+        volume: 0.5,
+        image_transition_interval: 15000,
+        selected_track: 1,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
       setUserPreferences: vi.fn(),
     });
 
@@ -236,7 +262,15 @@ describe('Home Component', () => {
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       token: 'fake-token',
-      userPreferences: { selected_track: '1' },
+      userPreferences: {
+        id: '1',
+        user_id: '1',
+        volume: 0.5,
+        image_transition_interval: 15000,
+        selected_track: '1',
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
       setUserPreferences: vi.fn(),
     });
 
@@ -264,7 +298,11 @@ describe('Home Component', () => {
     // Verify API call to save preferences
     await waitFor(() => {
       expect(saveUserPreferences).toHaveBeenCalledWith('fake-token', {
-        preferences: { selected_track: '1', image_transition_interval: 20000 },
+        preferences: {
+          selected_track: '1',
+          image_transition_interval: 20000,
+          volume: 0.5,
+        },
       });
     });
 
@@ -278,7 +316,15 @@ describe('Home Component', () => {
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       token: 'fake-token',
-      userPreferences: {},
+      userPreferences: {
+        id: '1',
+        user_id: '1',
+        volume: 0.5,
+        image_transition_interval: 15000,
+        selected_track: '1',
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
       setUserPreferences: vi.fn(),
     });
 
@@ -309,6 +355,7 @@ describe('Home Component', () => {
         'fake-token',
         expect.objectContaining({
           preferences: expect.objectContaining({
+            volume: 0.5,
             image_transition_interval: 20000,
           }),
         })
