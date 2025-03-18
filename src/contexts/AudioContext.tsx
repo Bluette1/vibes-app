@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
 interface Track {
-  id: string | number | undefined;
+  id: number;
   name: string;
   src: string;
 }
@@ -37,8 +37,8 @@ export const AudioProvider: React.FC<{
       } else {
         // Fall back to localStorage or first track
         const savedTrackId = localStorage.getItem('selectedMusicTrackId');
-        if (savedTrackId && tracks.some((track) => track.id === savedTrackId)) {
-          setSelectedTrackId(savedTrackId);
+        if (savedTrackId && tracks.some((track) => track.id.toString() === savedTrackId)) {
+          setSelectedTrackId(parseInt(savedTrackId));
         } else {
           setSelectedTrackId(tracks[0].id);
         }

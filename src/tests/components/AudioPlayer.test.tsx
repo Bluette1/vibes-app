@@ -42,9 +42,9 @@ describe('AudioPlayer', () => {
   it('renders the audio player', () => {
     renderWithProvider();
 
-    expect(screen.getByTestId('audio-player')).toBeInTheDocument();
-    expect(screen.getByLabelText(/play/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/mute/i)).toBeInTheDocument();
+    expect(screen.getByTestId('audio-player')).toBeTruthy();
+    expect(screen.getByLabelText(/play/i)).toBeTruthy();
+    expect(screen.getByLabelText(/mute/i)).toBeTruthy();
   });
 
   it.skip('plays and pauses the track', () => {
