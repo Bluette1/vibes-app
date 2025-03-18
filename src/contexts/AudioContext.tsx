@@ -2,16 +2,16 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
 interface Track {
-  id: string;
+  id: string | number | undefined;
   name: string;
   src: string;
 }
 
 interface AudioContextType {
   tracks: Track[];
-  selectedTrackId: string;
+  selectedTrackId: string | number | undefined;
   setTracks: (tracks: Track[]) => void;
-  selectTrack: (trackId: string) => void;
+  selectTrack: (trackId: string | number | undefined) => void;
   isTrackSaving: boolean;
 }
 
@@ -21,11 +21,11 @@ const AudioContext = createContext<AudioContextType | undefined>(undefined);
 export const AudioProvider: React.FC<{
   children: React.ReactNode;
   initialTracks?: Track[];
-  onTrackSelect?: (trackId: string) => Promise<void>;
-  initialSelectedTrackId?: string;
+  onTrackSelect?: (trackId: string | number | undefined) => Promise<void>;
+  initialSelectedTrackId?: string | number | undefined;
 }> = ({ children, initialTracks = [], onTrackSelect, initialSelectedTrackId }) => {
   const [tracks, setTracks] = useState<Track[]>(initialTracks);
-  const [selectedTrackId, setSelectedTrackId] = useState<string>('');
+  const [selectedTrackId, setSelectedTrackId] = useState<string | number | undefined>('');
   const [isTrackSaving, setIsTrackSaving] = useState<boolean>(false);
 
   // Initialize with provided ID, localStorage, or first track
@@ -48,12 +48,15 @@ export const AudioProvider: React.FC<{
 
   // Select track function with optional server saving
   const selectTrack = useCallback(
-    async (trackId: string) => {
+    async (trackId: string | number | undefined) => {
       // Update state immediately for responsive UI
       setSelectedTrackId(trackId);
 
       // Always update localStorage
-      localStorage.setItem('selectedMusicTrackId', trackId);
+
+      if (trackId) {
+        localStorage.setItem('selectedMusicTrackId', trackId?.toString());
+      }
 
       // If we have a server save callback, use it
       if (onTrackSelect) {

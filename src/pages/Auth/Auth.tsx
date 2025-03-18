@@ -34,7 +34,11 @@ const Auth: React.FC = () => {
             'transitionInterval',
             prefsData.preferences.image_transition_interval.toString()
           );
-          localStorage.setItem('selectedTrack', prefsData.preferences.selected_track);
+          if (prefsData.preferences.selected_track)
+            localStorage.setItem(
+              'selectedTrack',
+              prefsData.preferences.selected_track?.toString()
+            );
           localStorage.setItem('volume', prefsData.preferences.volume.toString());
         } catch (prefError) {
           console.error('Failed to load preferences, using defaults', prefError);

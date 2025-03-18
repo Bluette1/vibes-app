@@ -12,7 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Spinner from '../../components/Spinner/Spinner';
 
 interface Track {
-  id: string;
+  id: number;
   name: string;
   src: string;
 }
@@ -25,7 +25,7 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [initialSelectedTrackId, setInitialSelectedTrackId] = useState<string | undefined>(
+  const [initialSelectedTrackId, setInitialSelectedTrackId] = useState<string | number | undefined>(
     undefined
   );
 
@@ -98,7 +98,7 @@ const Home: React.FC = () => {
 
   // Handle track selection (to be passed to AudioProvider)
   const handleTrackSelect = useCallback(
-    async (trackId: string) => {
+    async (trackId: string | number | undefined) => {
       // Save to server without debouncing (since track changes are less frequent)
       await savePreferencesToServer({ selected_track: trackId });
     },
@@ -112,7 +112,7 @@ const Home: React.FC = () => {
       try {
         const data = await getAudios();
         const formattedTracks = data.map((item) => ({
-          id: item.id.toString(),
+          id: item.id,
           name: item.title,
           src: item.url,
         }));
@@ -121,7 +121,7 @@ const Home: React.FC = () => {
       } catch (err) {
         console.error('Failed to fetch tracks:', err);
         setError('Failed to load music tracks. Using default tracks instead.');
-        setTracks([{ id: 'focused', name: 'Focused', src: focusedAudio }]);
+        setTracks([{ id: 0, name: 'Focused', src: focusedAudio }]);
       } finally {
         setIsLoading(false);
       }

@@ -5,10 +5,10 @@ interface UserPreferences {
   id: number;
   user_id: number;
   volume: number;
-  selected_track: string | number;
+  selected_track: string | number | undefined;
   image_transition_interval: number;
-  created_at: string | Date;
-  updated_at: string | Date;
+  created_at: string | Date | undefined;
+  updated_at: string | Date | undefined;
 }
 
 interface User {
