@@ -4,7 +4,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 import Profile from '../../pages/Profile/Profile';
 import { useAuth } from '../../contexts/AuthContext';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi, Mock } from 'vitest';
 
 // Mock the useAuth hook
 vi.mock('../../contexts/AuthContext');
@@ -13,11 +13,13 @@ vi.mock('../../contexts/AuthContext');
 vi.mock('react-router-dom', () => {
   return {
     useNavigate: vi.fn(),
-    MemoryRouter: ({ children }) => <div data-testid="memory-router">{children}</div>,
+    MemoryRouter: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="memory-router">{children}</div>
+    ),
   };
 });
 
-const mockUseAuth = useAuth as jest.Mock;
+const mockUseAuth = useAuth as Mock;
 
 describe('Profile Component', () => {
   beforeEach(() => {
@@ -42,9 +44,8 @@ describe('Profile Component', () => {
         <Profile />
       </MemoryRouter>
     );
-
-    expect(screen.getByText(/Email:/)).toBeInTheDocument();
-    expect(screen.getByText('user@example.com')).toBeInTheDocument();
+    expect(screen.getByText(/Email:/)).toBeTruthy();
+    expect(screen.getByText('user@example.com')).toBeTruthy();
   });
 
   test('renders user preferences', () => {
@@ -53,20 +54,19 @@ describe('Profile Component', () => {
         <Profile />
       </MemoryRouter>
     );
-
-    expect(screen.getByText('Your Preferences')).toBeInTheDocument();
-    expect(screen.getByText('Image transition interval:')).toBeInTheDocument();
-    expect(screen.getByText('5 seconds')).toBeInTheDocument();
-    expect(screen.getByText('Volume level:')).toBeInTheDocument();
-    expect(screen.getByText('50%')).toBeInTheDocument();
-    expect(screen.getByText('Selected track ID:')).toBeInTheDocument();
-    expect(screen.getByText('track123')).toBeInTheDocument();
+    expect(screen.getByText('Your Preferences')).toBeTruthy();
+    expect(screen.getByText('Image transition interval:')).toBeTruthy();
+    expect(screen.getByText('5 seconds')).toBeTruthy();
+    expect(screen.getByText('Volume level:')).toBeTruthy();
+    expect(screen.getByText('50%')).toBeTruthy();
+    expect(screen.getByText('Selected track ID:')).toBeTruthy();
+    expect(screen.getByText('track123')).toBeTruthy();
   });
 
   test('renders no preferences message when userPreferences is undefined', () => {
     mockUseAuth.mockReturnValueOnce({
       user: { email: 'user@example.com' },
-      logout: vi.fn(),
+      logout: vi.fn() as unknown,
       userPreferences: null,
     });
 
@@ -75,13 +75,12 @@ describe('Profile Component', () => {
         <Profile />
       </MemoryRouter>
     );
-
-    expect(screen.getByText('No saved preferences found.')).toBeInTheDocument();
+    expect(screen.getByText('No saved preferences found.')).toBeTruthy();
   });
 
   test('handles back to home button click', () => {
     const navigate = vi.fn();
-    (useNavigate as jest.Mock).mockReturnValue(navigate); // Use the mocked useNavigate
+    (useNavigate as Mock).mockReturnValue(navigate); // Use the mocked useNavigate
 
     render(
       <MemoryRouter>
@@ -96,7 +95,7 @@ describe('Profile Component', () => {
   test('handles logout button click', () => {
     const { logout } = mockUseAuth();
     const navigate = vi.fn();
-    (useNavigate as jest.Mock).mockReturnValue(navigate); // Use the mocked useNavigate
+    (useNavigate as Mock).mockReturnValue(navigate); // Use the mocked useNavigate
 
     render(
       <MemoryRouter>
