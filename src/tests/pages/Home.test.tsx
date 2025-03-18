@@ -1,7 +1,7 @@
-// Home.test.tsx
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom'; // Import MemoryRouter
 import Home from '../../pages/Home/Home';
 import { getAudios, getUserPreferences, saveUserPreferences } from '../../utils/api';
 import { useAuth } from '../../contexts/AuthContext';
@@ -29,7 +29,7 @@ vi.mock('../../components/AudioPlayer/AudioPlayer', () => ({
 }));
 
 vi.mock('../../components/ImageRingBook/ImageRingBook', () => ({
-  default: ({ transitionInterval }) => (
+  default: ({ transitionInterval }: { transitionInterval: number }) => (
     <div data-testid="image-ring-book">Image Ring Book with interval: {transitionInterval}</div>
   ),
 }));
@@ -75,12 +75,11 @@ vi.mock('../../components/Spinner/Spinner', () => ({
   default: () => <div data-testid="spinner">Loading...</div>,
 }));
 
-// Mock localStorage
 const localStorageMock = {
   store: {},
-  getItem: vi.fn((key) => localStorageMock.store[key] || null),
-  setItem: vi.fn((key, value) => {
-    localStorageMock.store[key] = value.toString();
+  getItem: vi.fn((key: string) => localStorageMock.store[key] || null),
+  setItem: vi.fn((key: string, value: string) => {
+    localStorageMock.store[key] = value;
   }),
   clear: vi.fn(() => {
     localStorageMock.store = {};
@@ -107,42 +106,47 @@ describe('Home Component', () => {
     vi.resetAllMocks();
     localStorageMock.clear();
 
-    // Reset useAuth to default mock value
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: false,
       token: null,
       userPreferences: null,
       setUserPreferences: vi.fn(),
+      user: null,
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
-    // Default mocks
+    // Mock responses for API calls
     vi.mocked(getAudios).mockResolvedValue([
-      { id: '1', title: 'Test Audio 1', url: 'test1.mp3' },
-      { id: '2', title: 'Test Audio 2', url: 'test2.mp3' },
+      { id: 1, title: 'Test Audio 1', url: 'test1.mp3' },
+      { id: 2, title: 'Test Audio 2', url: 'test2.mp3' },
     ]);
 
     vi.mocked(getUserPreferences).mockResolvedValue({
-      id: '1',
-      user_id: '1',
-      volume: 0.5,
-      created_at: new Date(),
-      updated_at: new Date(),
-
       preferences: {
         image_transition_interval: 15000,
         selected_track: 1,
+        id: 0,
+        user_id: 0,
+        volume: 0,
+        created_at: undefined,
+        updated_at: undefined,
       },
     });
-    vi.mocked(saveUserPreferences).mockResolvedValue({ success: true });
+
+    vi.mocked(saveUserPreferences).mockResolvedValue();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  test('renders the RingBookCover initially', () => {
-    render(<Home />);
+  const renderWithRouter = (ui: React.ReactElement) => {
+    return render(<MemoryRouter>{ui}</MemoryRouter>);
+  };
 
+  test('renders the RingBookCover initially', () => {
+    renderWithRouter(<Home />);
     const ringBookCover = screen.getByTestId('ring-book-cover');
     const imageRingBook = screen.queryByTestId('image-ring-book');
 
@@ -151,20 +155,14 @@ describe('Home Component', () => {
   });
 
   test('opens the book when cover is clicked', async () => {
-    render(<Home />);
-
-    // Click on the cover to open the book
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByTestId('ring-book-cover'));
 
-    // Initially show spinner while loading
     expectToBeInDocument(screen.getByTestId('spinner'));
-
-    // Wait for audio to load
     await waitFor(() => {
       expect(getAudios).toHaveBeenCalled();
     });
 
-    // After loading
     await waitFor(() => {
       expectToBeInDocument(screen.getByTestId('image-ring-book'));
       expectToBeInDocument(screen.getByTestId('audio-player'));
@@ -175,7 +173,7 @@ describe('Home Component', () => {
     // Set value in mock localStorage
     localStorageMock.setItem('transitionInterval', '12000');
 
-    render(<Home />);
+    renderWithRouter(<Home />);
 
     // Open the book
     fireEvent.click(screen.getByTestId('ring-book-cover'));
@@ -201,9 +199,12 @@ describe('Home Component', () => {
         updated_at: new Date(),
       },
       setUserPreferences: vi.fn(),
+      user: null,
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
-    render(<Home />);
+    renderWithRouter(<Home />);
 
     // Open the book
     fireEvent.click(screen.getByTestId('ring-book-cover'));
@@ -222,7 +223,7 @@ describe('Home Component', () => {
     // Mock API failure
     vi.mocked(getAudios).mockRejectedValue(new Error('Network error'));
 
-    render(<Home />);
+    renderWithRouter(<Home />);
 
     // Open the book
     fireEvent.click(screen.getByTestId('ring-book-cover'));
@@ -235,7 +236,7 @@ describe('Home Component', () => {
   });
 
   test('opens and closes settings modal', async () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
 
     // Open the book
     fireEvent.click(screen.getByTestId('ring-book-cover'));
@@ -263,8 +264,8 @@ describe('Home Component', () => {
       isAuthenticated: true,
       token: 'fake-token',
       userPreferences: {
-        id: '1',
-        user_id: '1',
+        id: 1,
+        user_id: 1,
         volume: 0.5,
         image_transition_interval: 15000,
         selected_track: '1',
@@ -272,9 +273,12 @@ describe('Home Component', () => {
         updated_at: new Date(),
       },
       setUserPreferences: vi.fn(),
+      user: null,
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
-    render(<Home />);
+    renderWithRouter(<Home />);
 
     // Open the book
     fireEvent.click(screen.getByTestId('ring-book-cover'));
@@ -299,7 +303,7 @@ describe('Home Component', () => {
     await waitFor(() => {
       expect(saveUserPreferences).toHaveBeenCalledWith('fake-token', {
         preferences: {
-          selected_track: '1',
+          selected_track: 1,
           image_transition_interval: 20000,
           volume: 0.5,
         },
@@ -317,8 +321,8 @@ describe('Home Component', () => {
       isAuthenticated: true,
       token: 'fake-token',
       userPreferences: {
-        id: '1',
-        user_id: '1',
+        id: 1,
+        user_id: 1,
         volume: 0.5,
         image_transition_interval: 15000,
         selected_track: '1',
@@ -326,9 +330,12 @@ describe('Home Component', () => {
         updated_at: new Date(),
       },
       setUserPreferences: vi.fn(),
+      user: null,
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
-    render(<Home />);
+    renderWithRouter(<Home />);
 
     // Open the book
     fireEvent.click(screen.getByTestId('ring-book-cover'));
