@@ -150,7 +150,12 @@ const Home: React.FC = () => {
 
           // Handle selected track from server
           if (data.preferences.selected_track) {
-            setInitialSelectedTrackId(data.preferences.selected_track);
+            const selectedTrack =
+              typeof data.preferences.selected_track == 'string'
+                ? parseInt(data.preferences.selected_track)
+                : data.preferences.selected_track;
+
+            setInitialSelectedTrackId(selectedTrack);
           }
 
           isInitializedRef.current = true;
