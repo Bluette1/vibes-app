@@ -63,5 +63,9 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts',
     css: true,
     testTimeout: 20000, // Set global timeout to 20 seconds
+    coverage: {
+      provider: 'v8', // or 'istanbul'
+      reporter: ['text', 'json', 'html'],
+    },
   },
 });
