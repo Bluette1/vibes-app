@@ -64,7 +64,7 @@ export default defineConfig({
     css: true,
     testTimeout: 20000, // Set global timeout to 20 seconds
     coverage: {
-      provider: 'v8', // or 'istanbul'
+      provider: 'istanbul', // or 'v8'
       reporter: ['text', 'json', 'html'],
     },
   },
