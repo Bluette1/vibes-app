@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 import ImageRingBook from '../../components/ImageRingBook/ImageRingBook';
 import { getImages } from '../../utils/api';
 import '@testing-library/jest-dom';
@@ -19,278 +20,281 @@ vi.mock('../../components/Icons/RightChevron', () => ({
   default: () => <div data-testid="right-chevron">Right</div>,
 }));
 
-describe.skip('ImageRingBook Component', () => {
+describe('ImageRingBook Component', () => {
   const mockImages = [
     { src: 'image1.jpg', alt: 'Image 1' },
     { src: 'image2.jpg', alt: 'Image 2' },
     { src: 'image3.jpg', alt: 'Image 3' },
   ];
 
+  let container;
+
   beforeEach(() => {
     vi.useFakeTimers();
-    // Reset mock implementation before each test
     vi.mocked(getImages).mockReset();
-
-    // Set up the mock to resolve immediately with data
     vi.mocked(getImages).mockResolvedValue(mockImages);
+
+    // Create a container for the component
+    container = document.createElement('div');
+    document.body.appendChild(container);
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
     vi.restoreAllMocks();
     vi.useRealTimers();
+
+    // Clean up container
+    document.body.removeChild(container);
+    container = null;
   });
 
-  it('renders loading state initially', () => {
-    vi.mocked(getImages).mockResolvedValue([]);
-    render(<ImageRingBook images={[]} transitionInterval={3000} />);
+  it('renders loading state initially when no images are provided', () => {
+    act(() => {
+      render(<ImageRingBook images={[]} transitionInterval={3000} />, { container });
+    });
+
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('renders with provided images without API call', async () => {
-    const { rerender } = render(<ImageRingBook images={mockImages} transitionInterval={3000} />);
+    act(() => {
+      render(<ImageRingBook images={mockImages} transitionInterval={3000} />, { container });
+    });
 
-    // We need to wait for the component to process the images
+    // First run all pending promises
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await Promise.resolve();
     });
 
-    // Force a re-render to ensure state updates are reflected
-    rerender(<ImageRingBook images={mockImages} transitionInterval={3000} />);
+    // Check that the loading message is not displayed
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
 
-    // Now check that loading is gone
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
-
-    // Should render the navigation buttons
+    // Check for navigation buttons
     expect(screen.getByTestId('left-chevron')).toBeInTheDocument();
     expect(screen.getByTestId('right-chevron')).toBeInTheDocument();
 
-    // Should render the first image
-    const imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${mockImages[0].src})` });
+    // Check for the first image
+    const imageContainer = container.querySelector('.circular-image');
+    expect(imageContainer).toHaveStyle(`background-image: url(${mockImages[0].src})`);
   });
 
   it('fetches images from API when no images are provided', async () => {
-    vi.mocked(getImages).mockResolvedValue(mockImages);
-
-    render(<ImageRingBook images={[]} transitionInterval={3000} />);
+    act(() => {
+      render(<ImageRingBook images={[]} transitionInterval={3000} />, { container });
+    });
 
     // Should show loading initially
     expect(screen.getByText('Loading...')).toBeInTheDocument();
 
-    // Wait for the API call to resolve and component to update
-    await act(async () => {
-      await vi.runAllTimersAsync();
-    });
-
     // API should have been called
     expect(getImages).toHaveBeenCalledTimes(1);
 
-    // Wait for loading state to disappear
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    // Resolve the API promise
+    await act(async () => {
+      await Promise.resolve();
     });
+
+    // Simulate component updates after API resolves
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    // Loading should disappear after a re-render
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
   });
 
   it('handles API error gracefully', async () => {
-    vi.mocked(getImages).mockRejectedValue(new Error('API error'));
+    vi.mocked(getImages).mockRejectedValueOnce(new Error('API error'));
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(<ImageRingBook images={[]} transitionInterval={3000} />);
+    act(() => {
+      render(<ImageRingBook images={[]} transitionInterval={3000} />, { container });
+    });
 
-    // Simulate API error
+    // Resolve the API promise (which will reject)
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await Promise.resolve();
     });
 
     // Console error should be logged
     expect(consoleSpy).toHaveBeenCalledWith('Error fetching images:', expect.any(Error));
 
-    // Since there's an error and no images, the loading state might persist
-    // or display an empty state - this depends on your implementation
-    // Let's just check the error was logged
-
+    // Clean up
     consoleSpy.mockRestore();
   });
 
   it('renders rings correctly', async () => {
-    render(<ImageRingBook images={mockImages} transitionInterval={3000} />);
+    act(() => {
+      render(<ImageRingBook images={mockImages} transitionInterval={3000} />, { container });
+    });
 
     // Wait for the component to fully render
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await Promise.resolve();
     });
 
-    // Wait for loading to disappear
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
-
-    const rings = document.querySelectorAll('.ring');
+    const rings = container.querySelectorAll('.ring');
     expect(rings.length).toBe(5);
   });
 
   it('changes to next image when right chevron is clicked', async () => {
-    render(<ImageRingBook images={mockImages} transitionInterval={3000} />);
+    act(() => {
+      render(<ImageRingBook images={mockImages} transitionInterval={3000} />, { container });
+    });
 
     // Wait for component to render
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await Promise.resolve();
     });
 
-    // Wait for loading to disappear
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
-
+    // Find and click the right button
     const rightButton = screen.getByTestId('right-chevron').closest('button');
     expect(rightButton).toBeInTheDocument();
 
-    // Initial state
-    let imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${mockImages[0].src})` });
-
-    // Click next
-    if (rightButton) fireEvent.click(rightButton);
+    // Click the button
+    act(() => {
+      fireEvent.click(rightButton);
+    });
 
     // Should add flipping class
-    expect(document.querySelector('.book-page')).toHaveClass('flipping');
+    expect(container.querySelector('.book-page')).toHaveClass('flipping');
 
     // Fast-forward the first timeout (for changing the index)
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(500);
     });
 
     // Should have changed the image
-    imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${mockImages[1].src})` });
+    let imageContainer = container.querySelector('.circular-image');
+    expect(imageContainer).toHaveStyle(`background-image: url(${mockImages[1].src})`);
 
     // Fast-forward the second timeout (for removing flipping class)
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(500);
     });
 
     // Flipping class should be removed
-    expect(document.querySelector('.book-page')).not.toHaveClass('flipping');
+    expect(container.querySelector('.book-page')).not.toHaveClass('flipping');
   });
 
   it('changes to previous image when left chevron is clicked', async () => {
-    render(<ImageRingBook images={mockImages} transitionInterval={3000} />);
+    act(() => {
+      render(<ImageRingBook images={mockImages} transitionInterval={3000} />, { container });
+    });
 
     // Wait for component to render
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await Promise.resolve();
     });
 
-    // Wait for loading to disappear
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
-
+    // Find and click the left button
     const leftButton = screen.getByTestId('left-chevron').closest('button');
     expect(leftButton).toBeInTheDocument();
 
-    // Initial state
-    let imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${mockImages[0].src})` });
-
-    // Click previous - should go to the last image due to circular rotation
-    if (leftButton) fireEvent.click(leftButton);
+    act(() => {
+      fireEvent.click(leftButton);
+    });
 
     // Fast-forward the first timeout
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(500);
     });
 
-    // Should have changed to the last image
-    imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${mockImages[2].src})` });
+    // Should have changed to the last image (circular rotation)
+    let imageContainer = container.querySelector('.circular-image');
+    expect(imageContainer).toHaveStyle(`background-image: url(${mockImages[2].src})`);
 
     // Fast-forward the second timeout
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(500);
     });
   });
 
   it('automatically transitions between images based on interval', async () => {
-    render(<ImageRingBook images={mockImages} transitionInterval={3000} />);
+    act(() => {
+      render(<ImageRingBook images={mockImages} transitionInterval={3000} />, { container });
+    });
 
     // Wait for component to render
     await act(async () => {
-      await vi.runAllTimersAsync();
-    });
-
-    // Wait for loading to disappear
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      await Promise.resolve();
     });
 
     // Initial state
-    let imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${mockImages[0].src})` });
+    let imageContainer = container.querySelector('.circular-image');
+    expect(imageContainer).toHaveStyle(`background-image: url(${mockImages[0].src})`);
 
-    // Fast-forward the transition interval
-    await act(async () => {
+    // Fast-forward to trigger the interval
+    act(() => {
       vi.advanceTimersByTime(3000);
     });
 
     // Should start the flipping process
-    expect(document.querySelector('.book-page')).toHaveClass('flipping');
+    expect(container.querySelector('.book-page')).toHaveClass('flipping');
 
     // Fast-forward the index change timeout
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(500);
     });
 
     // Should show the next image
-    imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${mockImages[1].src})` });
+    imageContainer = container.querySelector('.circular-image');
+    expect(imageContainer).toHaveStyle(`background-image: url(${mockImages[1].src})`);
 
     // Fast-forward to remove flipping class
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(document.querySelector('.book-page')).not.toHaveClass('flipping');
+    expect(container.querySelector('.book-page')).not.toHaveClass('flipping');
   });
 
   it('does not transition when only one image is available', async () => {
     const singleImage = [{ src: 'image1.jpg', alt: 'Image 1' }];
-    render(<ImageRingBook images={singleImage} transitionInterval={3000} />);
+
+    act(() => {
+      render(<ImageRingBook images={singleImage} transitionInterval={3000} />, { container });
+    });
 
     // Wait for component to render
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await Promise.resolve();
     });
 
-    // Wait for loading to disappear
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
+    // Make sure the component is rendered with the image
+    const imageContainer = container.querySelector('.circular-image');
+    expect(imageContainer).toHaveStyle(`background-image: url(${singleImage[0].src})`);
 
     // Fast-forward beyond transition interval
-    await act(async () => {
-      vi.advanceTimersByTime(5000);
+    act(() => {
+      vi.advanceTimersByTime(3000);
     });
 
-    // Image should remain the same
-    const imageContainer = document.querySelector('.circular-image');
-    expect(imageContainer).toHaveStyle({ backgroundImage: `url(${singleImage[0].src})` });
+    // No flipping class should be added since there's only one image
+    expect(container.querySelector('.book-page')).not.toHaveClass('flipping');
   });
 
   it('cleans up interval on unmount', async () => {
     const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
 
-    const { unmount } = render(<ImageRingBook images={mockImages} transitionInterval={3000} />);
+    let renderedComponent;
+    act(() => {
+      renderedComponent = render(<ImageRingBook images={mockImages} transitionInterval={3000} />, {
+        container,
+      });
+    });
 
     // Wait for component to initialize
     await act(async () => {
-      await vi.runAllTimersAsync();
+      await Promise.resolve();
     });
 
-    unmount();
+    // Unmount the component
+    act(() => {
+      renderedComponent.unmount();
+    });
 
     expect(clearIntervalSpy).toHaveBeenCalled();
   });

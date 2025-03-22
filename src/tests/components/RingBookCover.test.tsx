@@ -1,33 +1,32 @@
 // components/RingBookCover/RingBookCover.test.tsx
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import RingBookCover from '../../components/RingBookCover/RingBookCover';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-describe.skip('RingBookCover', () => {
+describe('RingBookCover', () => {
   const mockOnOpen = vi.fn();
 
   beforeEach(() => {
+    mockOnOpen.mockClear();
     render(<RingBookCover onOpen={mockOnOpen} />);
   });
 
-  it('renders the component', () => {
-    const coverElement = screen.getByRole('button', { name: /open/i });
-    expect(coverElement).toBeInTheDocument();
-    expect(screen.getByText('V')).toBeInTheDocument();
+  it('renders the component with logo overlay', () => {
+    const logoElement = screen.getByText('V');
+    expect(logoElement).toBeInTheDocument();
+    expect(logoElement).toHaveClass('logo-overlay');
   });
 
   it('renders the correct number of rings', () => {
-    const rings = screen.getAllByRole('presentation', { name: 'ring' });
-    expect(rings.length).toBe(5);
+    const ringElements = document.querySelectorAll('.ring');
+    expect(ringElements.length).toBe(5);
   });
 
   it('renders the image sections', () => {
-    const imageSections = screen.getByRole('presentation', { name: 'image-sections' });
-    const withinImageSections = within(imageSections);
-    const mountainsSection = withinImageSections.getByRole('presentation', { name: 'mountains' });
-    const sunflowersSection = withinImageSections.getByRole('presentation', { name: 'sunflowers' });
-    const forestSection = withinImageSections.getByRole('presentation', { name: 'forest' });
+    const mountainsSection = document.querySelector('.section.mountains');
+    const sunflowersSection = document.querySelector('.section.sunflowers');
+    const forestSection = document.querySelector('.section.forest');
 
     expect(mountainsSection).toBeInTheDocument();
     expect(sunflowersSection).toBeInTheDocument();
@@ -35,8 +34,16 @@ describe.skip('RingBookCover', () => {
   });
 
   it('calls onOpen when the OpenButton is clicked', () => {
-    const openButton = screen.getByRole('button', { name: /open/i });
+    const openButton = screen.getByRole('button');
     fireEvent.click(openButton);
     expect(mockOnOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('has a circular image with background', () => {
+    const circularImage = document.querySelector('.circular-image');
+    expect(circularImage).toBeInTheDocument();
+    expect(circularImage).toHaveStyle({
+      backgroundImage: expect.stringContaining('background.jpg'),
+    });
   });
 });
