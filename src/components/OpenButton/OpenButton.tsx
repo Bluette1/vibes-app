@@ -3,7 +3,6 @@ import React from 'react';
 import './OpenButton.css';
 import OpenIcon from '../Icons/OpenIcon';
 
-
 interface OpenButtonProps {
   onOpen: () => void;
 }
@@ -11,7 +10,7 @@ interface OpenButtonProps {
 const OpenButton: React.FC<OpenButtonProps> = ({ onOpen }) => {
   return (
     <button className="open-button" onClick={onOpen}>
-      <OpenIcon/>
+      <OpenIcon />
     </button>
   );
 };

@@ -1,5 +1,5 @@
-import * as React from "react";
-import './Icons.css'
+import * as React from 'react';
+import './Icons.css';
 
 const OpenButton: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg

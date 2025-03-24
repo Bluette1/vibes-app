@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 const ProfileLogin: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
     viewBox="0 0 24 24"
@@ -9,11 +9,7 @@ const ProfileLogin: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     {...props}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth={0} />
-    <g
-      id="SVGRepo_tracerCarrier"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
       <path
         opacity={0.4}

@@ -1,5 +1,5 @@
-import * as React from "react"
-import './Icons.css'
+import * as React from 'react';
+import './Icons.css';
 
 const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -17,5 +17,5 @@ const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
       <path d="M795.328 846.827c8.19 8.471 21.695 8.7 30.166.511 8.471-8.188 8.7-21.694.511-30.165l-618.667-640c-8.188-8.471-21.694-8.7-30.165-.511-8.471 8.188-8.7 21.694-.511 30.165l618.666 640z" />
     </g>
   </svg>
-)
-export default CloseIcon
+);
+export default CloseIcon;

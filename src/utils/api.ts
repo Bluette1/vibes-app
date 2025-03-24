@@ -8,7 +8,7 @@ interface ImageResponse {
 }
 
 interface AudioResponse {
-  id: string;
+  id: number;
   title: string;
   url: string;
 }
@@ -106,10 +106,10 @@ interface Preferences {
   id: number;
   user_id: number;
   volume: number;
-  selected_track: string;
+  selected_track: number | string | undefined;
   image_transition_interval: number;
-  created_at: string;
-  updated_at: string;
+  created_at: Date | string | undefined;
+  updated_at: Date | string | undefined;
 }
 
 interface UserPreferences {

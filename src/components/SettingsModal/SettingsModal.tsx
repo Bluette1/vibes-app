@@ -19,7 +19,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const { tracks, selectedTrackId, selectTrack, isTrackSaving } = useAudio();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleTrackSelect = (trackId: string) => {
+  const handleTrackSelect = (trackId: string | number | undefined) => {
     selectTrack(trackId);
     setIsOpen(false);
   };
