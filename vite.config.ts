@@ -32,7 +32,7 @@ export default defineConfig({
       workbox: {
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/vibes-api-space-f970ef69ea72.herokuapp.com\/api\/images/,
+            urlPattern: /^https:\/\/vibes-api-gn8v.onrender.com\/api\/images/,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'image-cache',
@@ -43,7 +43,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: /^https:\/\/vibes-api-space-f970ef69ea72.herokuapp.com\/api\/audios/,
+            urlPattern: /^https:\/\/vibes-api-gn8v.onrender.com\/api\/audios/,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'audio-cache',
